@@ -26,20 +26,26 @@ const formSchema = z.object({
 type LoginFieldValues = InferZodSchema<typeof formSchema>;
 
 export default function LoginForm() {
+  async function handleSubmit(data: LoginFieldValues) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(data);
+      }, 4000);
+    });
+  }
+
   return (
     <MotalentForm<LoginFieldValues, object, LoginFieldValues>
-      onSubmit={(data) => {
-        alert(JSON.stringify(data));
-      }}
+      onSubmit={async (data) => await handleSubmit(data)}
       resolver={zodResolver(formSchema)}
       defaultValues={{
-        email: "deprasny@mail.com",
+        email: "",
         password: "",
         rememberMe: false,
       }}
       mode="onChange"
     >
-      {({ control }) => (
+      {({ control, formState }) => (
         <div className="flex flex-col gap-4">
           <FormField
             name="email"
@@ -64,6 +70,8 @@ export default function LoginForm() {
               <MotalentFormItem label="Password">
                 <MotalentInput
                   placeholder="Please enter your password here.."
+                  disabled={formState.isSubmitting}
+                  type="password"
                   {...field}
                 />
               </MotalentFormItem>
@@ -83,6 +91,7 @@ export default function LoginForm() {
                     onCheckedChange={(value) => {
                       onChange(value);
                     }}
+                    disabled={formState.isSubmitting}
                     {...restFields}
                   />
                   <label
@@ -96,7 +105,13 @@ export default function LoginForm() {
             )}
           />
 
-          <Button type="submit">Login</Button>
+          <Button
+            loadingText="Signin..."
+            isLoading={formState.isSubmitting}
+            type="submit"
+          >
+            Login
+          </Button>
         </div>
       )}
     </MotalentForm>
