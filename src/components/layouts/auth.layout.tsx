@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { cn } from "@/lib/utils";
-import { buttonVariants } from "@/components/shared/atoms/button";
+import { buttonVariants } from "@/components/shared/atoms/motalent-button";
 // import { UserAuthForm } from "@/app/examples/authentication/components/user-auth-form"
 
 export const metadata: Metadata = {
