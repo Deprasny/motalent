@@ -1,4 +1,4 @@
-import { Button } from '@/components/shared/atoms/button';
+import { Button } from "@/components/shared/atoms/motalent-button";
 
 export default function Home() {
   return (
