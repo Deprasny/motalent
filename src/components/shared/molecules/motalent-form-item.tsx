@@ -1,30 +1,30 @@
 import {
-  FormControl,
-  FormDescription,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+    FormControl,
+    FormDescription,
+    FormItem,
+    FormLabel,
+    FormMessage
+} from '@/components/ui/form';
 
 interface MotalentFormItemProps {
-  label?: string;
-  children?: React.ReactNode;
-  description?: string;
-  message?: string;
+    label?: string;
+    children?: React.ReactNode;
+    description?: string;
+    message?: string;
 }
 
 export default function MotalentFormItem({
-  label,
-  children,
-  description,
-  message,
+    label,
+    children,
+    description,
+    message
 }: MotalentFormItemProps) {
-  return (
-    <FormItem>
-      <FormLabel>{label}</FormLabel>
-      <FormControl>{children}</FormControl>
-      <FormDescription>{description}</FormDescription>
-      <FormMessage>{message}</FormMessage>
-    </FormItem>
-  );
+    return (
+        <FormItem>
+            <FormLabel>{label}</FormLabel>
+            <FormControl>{children}</FormControl>
+            <FormDescription>{description}</FormDescription>
+            <FormMessage>{message}</FormMessage>
+        </FormItem>
+    );
 }
