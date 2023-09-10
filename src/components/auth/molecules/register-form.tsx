@@ -25,9 +25,7 @@ const formSchema = z
             .nonempty('Password is required.')
             .min(8, 'Password is too short'),
         passwordConfirmation: z.string(),
-        rememberMe: z.boolean().refine((value) => value === true, {
-            message: 'Remember Me is required.'
-        })
+        rememberMe: z.boolean()
     })
     .refine((data) => data.password === data.passwordConfirmation, {
         message: 'Passwords do not match.',
