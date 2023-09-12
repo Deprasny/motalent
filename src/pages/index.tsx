@@ -27,9 +27,9 @@ const STEPS: StepperStep[] = [
 
 export default function Home() {
     const blocksIn = useClientRegistrationFormWizard((state) => [
-        !state.isValidProfile,
-        !state.isValidLocation,
-        !state.isValidPreference
+        state.isValidProfile,
+        state.isValidLocation,
+        state.isValidPreference
     ]);
 
     return (

@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import clsx from 'clsx';
 import { User } from 'lucide-react';
-import { isValidElement, useState } from 'react';
+import React, { isValidElement, useState } from 'react';
 
 interface StepperProps {
     defaultStep?: number;
@@ -51,8 +51,9 @@ export default function Stepper({
                     {steps.map((stepItem, index) => {
                         const isActive = currentStep === index;
                         const labelKey = `${index}_label`;
-                        const isBlock = blocksIn?.[index];
+                        const isEnable = blocksIn?.[index];
                         const isElementType = isValidElement(stepItem.label);
+                        console.log(isEnable);
 
                         const renderLabel = () => {
                             if (isElementType) return stepItem.label;
@@ -63,12 +64,25 @@ export default function Stepper({
                             return null;
                         };
 
-                        const isLastItem = index === steps.length - 1;
+                        const isFirstItem = index === 0;
 
                         return (
-                            <>
+                            <React.Fragment key={labelKey}>
+                                {!isFirstItem && (
+                                    <div
+                                        className={clsx([
+                                            'flex-auto border-t-2 transition duration-500 ease-in-out',
+                                            {
+                                                'border-blue-600':
+                                                    (blocksIn?.[0] &&
+                                                        blocksIn?.[1]) ||
+                                                    blocksIn?.[2],
+                                                'border-gray-400': !isEnable
+                                            }
+                                        ])}
+                                    />
+                                )}
                                 <div
-                                    key={labelKey}
                                     className={clsx([
                                         'flex items-center text-blue-600 relative',
                                         {
@@ -83,8 +97,8 @@ export default function Stepper({
                                             {
                                                 'bg-blue-600': isActive,
                                                 'text-gray-400': !isActive,
-                                                'pointer-events-none': isBlock,
-                                                'hover:opacity-85': !isBlock
+                                                'pointer-events-none': isEnable,
+                                                'hover:opacity-85': !isEnable
                                             }
                                         ])}
                                     >
@@ -102,18 +116,7 @@ export default function Stepper({
                                         {renderLabel() as React.ReactNode}
                                     </div>
                                 </div>
-                                {!isLastItem && (
-                                    <div
-                                        className={clsx([
-                                            'flex-auto border-t-2 transition duration-500 ease-in-out',
-                                            {
-                                                'border-blue-600': isActive, // Add border color when active
-                                                'border-gray-400': !isActive
-                                            }
-                                        ])}
-                                    />
-                                )}
-                            </>
+                            </React.Fragment>
                         );
                     })}
                 </div>
@@ -125,10 +128,10 @@ export default function Stepper({
                     const contentKey = `${index}_content`;
                     const isDisabledNext = index === steps.length - 1;
                     const isDisabledPrev = index <= 0;
-                    const isBlock = blocksIn?.[index];
+                    const isEnable = blocksIn?.[index];
 
                     const handleNextStep = () => {
-                        if (isBlock) return;
+                        if (!isEnable) return;
                         if (isDisabledNext) {
                             onFinish?.();
                         } else {
@@ -163,7 +166,7 @@ export default function Stepper({
                                         </Button>
 
                                         <Button
-                                            disabled={isBlock}
+                                            disabled={!isEnable}
                                             onClick={handleNextStep}
                                         >
                                             {buttonLabel}

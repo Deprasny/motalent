@@ -83,10 +83,10 @@ const INITIAL_STATE: UseClientRegistrationFormWizardStore = {
     isValidProfile: true,
     setIsValidProfile: (value) => {},
 
-    isValidLocation: true,
+    isValidLocation: false,
     setIsValidLocation: (value) => {},
 
-    isValidPreference: true,
+    isValidPreference: false,
     setIsValidPreference: (value) => {},
 
     setProfileForm: (state) => {},
