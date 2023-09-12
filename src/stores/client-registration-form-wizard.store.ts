@@ -80,13 +80,13 @@ const INITIAL_STATE: UseClientRegistrationFormWizardStore = {
         min_price: null,
         province_ids: null
     },
-    isValidProfile: false,
+    isValidProfile: true,
     setIsValidProfile: (value) => {},
 
-    isValidLocation: false,
+    isValidLocation: true,
     setIsValidLocation: (value) => {},
 
-    isValidPreference: false,
+    isValidPreference: true,
     setIsValidPreference: (value) => {},
 
     setProfileForm: (state) => {},

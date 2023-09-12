@@ -14,7 +14,7 @@ const STEPS: StepperStep[] = [
         content: () => <StepProfile />
     },
     {
-        label: 'Location & Area',
+        label: 'Location',
         isCustomStepActionButtons: false,
         content: () => <StepLocation />
     },
@@ -33,7 +33,7 @@ export default function Home() {
     ]);
 
     return (
-        <div className="flex flex-col max-w-lg mx-auto my-8">
+        <div className="flex flex-col w-[800px] mx-auto my-8">
             <Stepper
                 defaultStep={0}
                 steps={STEPS}

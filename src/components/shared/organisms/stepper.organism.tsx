@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import clsx from 'clsx';
+import { User } from 'lucide-react';
 import { isValidElement, useState } from 'react';
 
 interface StepperProps {
@@ -29,115 +30,136 @@ export interface StepperStep {
 }
 
 export default function Stepper({
-    defaultStep,
+    defaultStep = 0,
     onChangeStep,
-    step,
     steps,
     onFinish,
     blocksIn
 }: StepperProps) {
-    const [_step, _setStep] = useState<number>(defaultStep || 0);
+    const [currentStep, setCurrentStep] = useState<number>(defaultStep);
 
-    function handleChangeStep(current: number) {
-        _setStep(current);
-        onChangeStep?.(current);
-    }
+    const handleChangeStep = (newStep: number) => {
+        if (blocksIn?.[newStep]) return;
+        setCurrentStep(newStep);
+        onChangeStep?.(newStep);
+    };
 
     return (
-        <div className="flex flex-col w-full gap-4">
-            <div className="flex justify-between gap-3">
-                {steps.map((stepLabel, index) => {
-                    const isActive = (step || _step) === index;
-                    const labelKey = `${index}_label`;
+        <>
+            <div className="mx-4 py-10">
+                <div className="flex items-center">
+                    {steps.map((stepItem, index) => {
+                        const isActive = currentStep === index;
+                        const labelKey = `${index}_label`;
+                        const isBlock = blocksIn?.[index];
+                        const isElementType = isValidElement(stepItem.label);
 
-                    const isBlock = blocksIn && blocksIn[index];
+                        const renderLabel = () => {
+                            if (isElementType) return stepItem.label;
+                            if (typeof stepItem.label === 'string')
+                                return stepItem.label;
+                            if (typeof stepItem.label === 'function')
+                                return stepItem.label(isActive);
+                            return null;
+                        };
 
-                    const isElementType = isValidElement(stepLabel.label);
+                        const isLastItem = index === steps.length - 1;
 
-                    function _handleChangeStep(index: number) {
-                        if (isBlock) return;
-
-                        handleChangeStep(index);
-                    }
-
-                    const renderLabel = () => {
-                        if (isElementType) return stepLabel.label;
-
-                        if (typeof stepLabel.label === 'string')
-                            return stepLabel.label;
-
-                        if (typeof stepLabel.label === 'function')
-                            return stepLabel.label(isActive);
-
-                        return null;
-                    };
-
-                    return (
-                        <p
-                            key={labelKey}
-                            className={clsx([
-                                'cursor-pointer',
-                                {
-                                    'font-bold text-blue-400': isActive,
-                                    'text-gray-400': !isActive,
-                                    'pointer-events-none': isBlock,
-                                    'hover:opacity-75': !isBlock
-                                }
-                            ])}
-                            onClick={() => _handleChangeStep(index)}
-                        >
-                            {renderLabel() as React.ReactNode}
-                        </p>
-                    );
-                })}
+                        return (
+                            <>
+                                <div
+                                    key={labelKey}
+                                    className={clsx([
+                                        'flex items-center text-blue-600 relative',
+                                        {
+                                            'text-white': isActive
+                                        }
+                                    ])}
+                                    onClick={() => handleChangeStep(index)}
+                                >
+                                    <div
+                                        className={clsx([
+                                            'rounded-full transition duration-500 ease-in-out h-12 w-12 py-3 border-2 border-blue-600 flex justify-center items-center',
+                                            {
+                                                'bg-blue-600': isActive,
+                                                'text-gray-400': !isActive,
+                                                'pointer-events-none': isBlock,
+                                                'hover:opacity-85': !isBlock
+                                            }
+                                        ])}
+                                    >
+                                        <User />
+                                    </div>
+                                    <div
+                                        className={clsx([
+                                            'absolute top-0 -ml-10 text-center mt-16 w-32 text-xs font-medium uppercase ',
+                                            {
+                                                'text-gray-400': !isActive,
+                                                'text-blue-600': isActive
+                                            }
+                                        ])}
+                                    >
+                                        {renderLabel() as React.ReactNode}
+                                    </div>
+                                </div>
+                                {!isLastItem && (
+                                    <div
+                                        className={clsx([
+                                            'flex-auto border-t-2 transition duration-500 ease-in-out',
+                                            {
+                                                'border-blue-600': isActive, // Add border color when active
+                                                'border-gray-400': !isActive
+                                            }
+                                        ])}
+                                    />
+                                )}
+                            </>
+                        );
+                    })}
+                </div>
             </div>
 
             <div>
-                {steps.map((stepContent, index) => {
-                    const isActive = (step || _step) === index;
+                {steps.map((stepItem, index) => {
+                    const isActive = currentStep === index;
                     const contentKey = `${index}_content`;
-
                     const isDisabledNext = index === steps.length - 1;
                     const isDisabledPrev = index <= 0;
+                    const isBlock = blocksIn?.[index];
 
-                    const isBlock = blocksIn && blocksIn[index];
-
-                    function handleNextStep() {
+                    const handleNextStep = () => {
                         if (isBlock) return;
-
                         if (isDisabledNext) {
                             onFinish?.();
-                            return;
+                        } else {
+                            setCurrentStep((prevStep) => prevStep + 1);
                         }
+                    };
 
-                        _setStep((prev) => prev + 1);
-                    }
-
-                    function handlePrevStep() {
+                    const handlePrevStep = () => {
                         if (isDisabledPrev) return;
-
-                        _setStep((prev) => prev - 1);
-                    }
+                        setCurrentStep((prevStep) => prevStep - 1);
+                    };
 
                     const buttonLabel = isDisabledNext ? 'Finish' : 'Next';
 
-                    if (isActive)
-                        return (
+                    return (
+                        isActive && (
                             <div key={contentKey}>
-                                {stepContent.content({
+                                {stepItem.content({
                                     onChangeNextStep: handleNextStep,
                                     onChangePrevStep: handlePrevStep,
                                     isDisabledNext,
                                     isDisabledPrev
                                 })}
 
-                                {!stepContent?.isCustomStepActionButtons && (
+                                {!stepItem.isCustomStepActionButtons ? (
                                     <div className="flex w-full justify-end self-end gap-3">
                                         <Button
                                             disabled={isDisabledPrev}
                                             onClick={handlePrevStep}
                                         >
-                                            Prev Page
+                                            Prev
                                         </Button>
 
                                         <Button
@@ -147,13 +169,12 @@ export default function Stepper({
                                             {buttonLabel}
                                         </Button>
                                     </div>
-                                )}
+                                ) : null}
                             </div>
-                        );
-
-                    return null;
+                        )
+                    );
                 })}
             </div>
-        </div>
+        </>
     );
 }
