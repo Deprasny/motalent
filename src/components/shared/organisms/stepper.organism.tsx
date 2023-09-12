@@ -9,7 +9,6 @@ interface StepperProps {
     onChangeStep?: (step: number) => void;
     onFinish?: () => void;
     steps: StepperStep[];
-    blocksIn?: boolean[];
 }
 
 interface StepperRenderContentFnProps {
@@ -27,21 +26,29 @@ export interface StepperStep {
     label: React.ReactNode | string | ((isActive: boolean) => React.ReactNode);
     content: StepperRenderContentFn;
     isCustomStepActionButtons?: boolean;
+    isEligibleNextStep?: boolean;
 }
 
 export default function Stepper({
     defaultStep = 0,
     onChangeStep,
     steps,
-    onFinish,
-    blocksIn
+    onFinish
 }: StepperProps) {
-    const [currentStep, setCurrentStep] = useState<number>(defaultStep);
+    const [currentStepIndex, setCurrentStepIndex] =
+        useState<number>(defaultStep);
+    const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+
+    const currentStep = steps[currentStepIndex] || steps[0];
 
     const handleChangeStep = (newStep: number) => {
-        if (blocksIn?.[newStep]) return;
-        setCurrentStep(newStep);
+        if (!currentStep.isEligibleNextStep) return;
+        setCurrentStepIndex(newStep);
         onChangeStep?.(newStep);
+
+        if (!completedSteps.includes(newStep)) {
+            setCompletedSteps((prevSteps) => [...prevSteps, newStep]);
+        }
     };
 
     return (
@@ -49,11 +56,13 @@ export default function Stepper({
             <div className="mx-4 py-10">
                 <div className="flex items-center">
                     {steps.map((stepItem, index) => {
-                        const isActive = currentStep === index;
+                        const isActive = currentStepIndex === index;
                         const labelKey = `${index}_label`;
-                        const isEnable = blocksIn?.[index];
+
+                        const isEligibleToNextStep =
+                            stepItem.isEligibleNextStep;
+
                         const isElementType = isValidElement(stepItem.label);
-                        console.log(isEnable);
 
                         const renderLabel = () => {
                             if (isElementType) return stepItem.label;
@@ -66,6 +75,8 @@ export default function Stepper({
 
                         const isFirstItem = index === 0;
 
+                        const isCompletedStep = completedSteps.includes(index);
+
                         return (
                             <React.Fragment key={labelKey}>
                                 {!isFirstItem && (
@@ -74,10 +85,8 @@ export default function Stepper({
                                             'flex-auto border-t-2 transition duration-500 ease-in-out',
                                             {
                                                 'border-blue-600':
-                                                    (blocksIn?.[0] &&
-                                                        blocksIn?.[1]) ||
-                                                    blocksIn?.[2],
-                                                'border-gray-400': !isEnable
+                                                    isCompletedStep,
+                                                'border-gray-300': !isActive
                                             }
                                         ])}
                                     />
@@ -97,8 +106,10 @@ export default function Stepper({
                                             {
                                                 'bg-blue-600': isActive,
                                                 'text-gray-400': !isActive,
-                                                'pointer-events-none': isEnable,
-                                                'hover:opacity-85': !isEnable
+                                                'pointer-events-none':
+                                                    isEligibleToNextStep,
+                                                'hover:opacity-85':
+                                                    !isEligibleToNextStep
                                             }
                                         ])}
                                     >
@@ -124,24 +135,39 @@ export default function Stepper({
 
             <div>
                 {steps.map((stepItem, index) => {
-                    const isActive = currentStep === index;
+                    const isActive = currentStepIndex === index;
                     const contentKey = `${index}_content`;
                     const isDisabledNext = index === steps.length - 1;
                     const isDisabledPrev = index <= 0;
-                    const isEnable = blocksIn?.[index];
+                    const isEligibleToNextStep = stepItem.isEligibleNextStep;
 
                     const handleNextStep = () => {
-                        if (!isEnable) return;
+                        if (!isEligibleToNextStep) return;
+
                         if (isDisabledNext) {
                             onFinish?.();
                         } else {
-                            setCurrentStep((prevStep) => prevStep + 1);
+                            setCurrentStepIndex((prevStep) => prevStep + 1);
+
+                            if (!completedSteps.includes(index)) {
+                                setCompletedSteps((prevSteps) => [
+                                    ...prevSteps,
+                                    index
+                                ]);
+                            }
                         }
                     };
 
                     const handlePrevStep = () => {
                         if (isDisabledPrev) return;
-                        setCurrentStep((prevStep) => prevStep - 1);
+                        setCurrentStepIndex((prevStep) => prevStep - 1);
+
+                        if (!completedSteps.includes(index)) {
+                            setCompletedSteps((prevSteps) => [
+                                ...prevSteps,
+                                index
+                            ]);
+                        }
                     };
 
                     const buttonLabel = isDisabledNext ? 'Finish' : 'Next';
@@ -166,7 +192,7 @@ export default function Stepper({
                                         </Button>
 
                                         <Button
-                                            disabled={!isEnable}
+                                            disabled={!isEligibleToNextStep}
                                             onClick={handleNextStep}
                                         >
                                             {buttonLabel}

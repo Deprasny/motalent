@@ -10,7 +10,11 @@ import { SelectOptions } from '@/interfaces/global.interface';
 
 import { InferZodSchema } from '@/interfaces/zod.interface';
 
-import { ClientProfileFormState } from '@/stores/client-registration-form-wizard.store';
+import {
+    ClientProfileFormState,
+    useClientRegistrationFormWizard
+} from '@/stores/client-registration-form-wizard.store';
+import { Button } from '@/components/ui/button';
 
 const formSchema = z.object({
     name: z.string().nonempty(),
@@ -50,6 +54,11 @@ const StepProfile = () => {
             }, 4000);
         });
     }
+
+    const setIsValidProfile = useClientRegistrationFormWizard(
+        (state) => state.setIsValidProfile
+    );
+
     return (
         <MotalentForm<FieldValues, object, FieldValues>
             onSubmit={async (data) => await handleSubmit(data)}
@@ -188,6 +197,13 @@ const StepProfile = () => {
                             />
                         </div>
                     </div>
+
+                    <Button
+                        type="button"
+                        onClick={() => setIsValidProfile(true)}
+                    >
+                        Validate Me!
+                    </Button>
                 </div>
             )}
         </MotalentForm>
