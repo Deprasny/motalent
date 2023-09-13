@@ -39,12 +39,7 @@ export default function Home() {
         ],
         [isValidLocation, isValidPreference, isValidProfile]
     );
-
-    console.log({
-        isValidLocation,
-        isValidPreference,
-        isValidProfile
-    });
+    console.log(isValidProfile);
 
     return (
         <div className="flex flex-col w-[800px] mx-auto my-8">

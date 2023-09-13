@@ -73,24 +73,12 @@ export default function Stepper({
                             return null;
                         };
 
-                        const isFirstItem = index === 0;
+                        const isLastItem = index === steps.length - 1;
 
                         const isCompletedStep = completedSteps.includes(index);
 
                         return (
                             <React.Fragment key={labelKey}>
-                                {!isFirstItem && (
-                                    <div
-                                        className={clsx([
-                                            'flex-auto border-t-2 transition duration-500 ease-in-out',
-                                            {
-                                                'border-blue-600':
-                                                    isCompletedStep,
-                                                'border-gray-300': !isActive
-                                            }
-                                        ])}
-                                    />
-                                )}
                                 <div
                                     className={clsx([
                                         'flex items-center text-blue-600 relative',
@@ -126,7 +114,31 @@ export default function Stepper({
                                     >
                                         {renderLabel() as React.ReactNode}
                                     </div>
+                                    <div
+                                        className={clsx([
+                                            'flex-auto border-t-2 transition duration-500 ease-in-out',
+                                            {
+                                                'border-blue-600':
+                                                    isCompletedStep,
+                                                'border-gray-300':
+                                                    !isCompletedStep
+                                            }
+                                        ])}
+                                    />
                                 </div>
+                                {!isLastItem && (
+                                    <div
+                                        className={clsx([
+                                            'flex-auto border-t-2 transition duration-500 ease-in-out',
+                                            {
+                                                'border-blue-600':
+                                                    isCompletedStep,
+                                                'border-gray-300':
+                                                    !isCompletedStep
+                                            }
+                                        ])}
+                                    />
+                                )}
                             </React.Fragment>
                         );
                     })}

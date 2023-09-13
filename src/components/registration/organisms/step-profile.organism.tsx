@@ -14,12 +14,11 @@ import {
     ClientProfileFormState,
     useClientRegistrationFormWizard
 } from '@/stores/client-registration-form-wizard.store';
-import { Button } from '@/components/ui/button';
 
 const formSchema = z.object({
     name: z.string().nonempty(),
     address: z.string().nonempty(),
-    age: z.number(),
+    age: z.string(),
     blood_type: z.string().nonempty(),
     dob: z.string().nonempty(),
     gender: z.string().nonempty()
@@ -66,12 +65,16 @@ const StepProfile = () => {
             defaultValues={{
                 name: '',
                 address: '',
-                age: 0,
+                age: '',
                 blood_type: '',
                 dob: '',
                 gender: ''
             }}
             mode="onChange"
+            reValidateMode="onChange"
+            onIsValid={(value) => {
+                setIsValidProfile(value);
+            }}
         >
             {({ control }) => (
                 <div className="flex flex-col gap-4">
@@ -197,13 +200,6 @@ const StepProfile = () => {
                             />
                         </div>
                     </div>
-
-                    <Button
-                        type="button"
-                        onClick={() => setIsValidProfile(true)}
-                    >
-                        Validate Me!
-                    </Button>
                 </div>
             )}
         </MotalentForm>
