@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Form } from '@/components/ui/form';
 import React, { useEffect } from 'react';
 import {
@@ -16,7 +17,8 @@ interface MotalentFormProps<
     onSubmit: TTransformedValues extends FieldValues
         ? SubmitHandler<TTransformedValues>
         : SubmitHandler<TFieldValues>;
-    onIsValid?: (value: boolean) => void;
+    onInvalid?: () => void;
+    onValid?: () => void;
     children: (
         props: UseFormReturn<TFieldValues, TContext, TTransformedValues>
     ) => React.ReactNode;
@@ -29,7 +31,8 @@ export default function MotalentForm<
 >({
     children,
     onSubmit,
-    onIsValid,
+    onInvalid,
+    onValid,
     ...restProps
 }: MotalentFormProps<TFieldValues, TContext, TTransformedValues>) {
     const methods = useForm<TFieldValues, TContext, TTransformedValues>({
@@ -38,10 +41,12 @@ export default function MotalentForm<
 
     useEffect(() => {
         const isValid = methods.formState.isValid;
-        if (isValid) {
-            onIsValid?.(true);
-        } else {
-            onIsValid?.(false);
+        if (isValid && onValid) {
+            onValid?.();
+        }
+
+        if (!isValid && onInvalid) {
+            onInvalid?.();
         }
     }, [methods.formState.isValid]);
 

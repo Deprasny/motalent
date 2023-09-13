@@ -103,7 +103,6 @@ export const useClientRegistrationFormWizard =
             isValidLocation: INITIAL_STATE.isValidLocation,
             isValidPreference: INITIAL_STATE.isValidPreference,
             isValidProfile: INITIAL_STATE.isValidProfile,
-
             setIsValidLocation: (v) =>
                 set({
                     isValidLocation: v
@@ -116,29 +115,26 @@ export const useClientRegistrationFormWizard =
                 set({
                     isValidProfile: v
                 }),
-
             setLocationForm: (state) =>
-                set((prev) => ({
+                set({
                     locationState: {
-                        ...prev.locationState,
+                        ...get().locationState,
                         ...state
                     }
-                })),
+                }),
             setProfileForm: (state) =>
-                set((prev) => ({
-                    ...prev,
+                set({
                     profileState: {
-                        ...prev.profileState,
+                        ...get().profileState,
                         ...state
                     }
-                })),
+                }),
             setSearchPreferenceForm: (state) =>
-                set((prev) => ({
-                    ...prev,
+                set({
                     preferenceState: {
-                        ...prev.preferenceState,
+                        ...get().preferenceState,
                         ...state
                     }
-                }))
+                })
         };
     });

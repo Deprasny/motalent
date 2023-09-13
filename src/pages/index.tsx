@@ -20,27 +20,25 @@ export default function Home() {
         () => [
             {
                 label: 'Profile',
-                isCustomStepActionButtons: false,
+                isCustomStepActionButtons: true,
                 isEligibleNextStep: isValidProfile,
                 content: () => <StepProfile />
             },
             {
                 label: 'Location',
-                isCustomStepActionButtons: false,
+                isCustomStepActionButtons: true,
                 isEligibleNextStep: isValidLocation,
                 content: () => <StepLocation />
             },
             {
                 label: 'Preference',
-                isCustomStepActionButtons: false,
+                isCustomStepActionButtons: true,
                 isEligibleNextStep: isValidPreference,
                 content: () => <StepPreference />
             }
         ],
         [isValidLocation, isValidPreference, isValidProfile]
     );
-    console.log(isValidProfile);
-
     return (
         <div className="flex flex-col w-[800px] mx-auto my-8">
             <Stepper defaultStep={0} steps={steps} />

@@ -1,7 +1,13 @@
 import { Button } from '@/components/ui/button';
 import clsx from 'clsx';
-import { User } from 'lucide-react';
-import React, { isValidElement, useState } from 'react';
+import { Check, User } from 'lucide-react';
+import React, {
+    createContext,
+    isValidElement,
+    useCallback,
+    useMemo,
+    useState
+} from 'react';
 
 interface StepperProps {
     defaultStep?: number;
@@ -29,6 +35,22 @@ export interface StepperStep {
     isEligibleNextStep?: boolean;
 }
 
+type StepperContextProps = {
+    steps: StepperStep[];
+    defaultStep: number;
+    step: number;
+    isFirstStep: boolean;
+    isLastStep: boolean;
+    onChangeStep: (step: number) => void;
+    handleNextStep: () => void;
+    handlePrevStep: () => void;
+    onFinish?: () => void;
+};
+
+const StepperContext = createContext<StepperContextProps | null>(null);
+const StepperProvider = StepperContext.Provider;
+export const useStepperContext = () => React.useContext(StepperContext);
+
 export default function Stepper({
     defaultStep = 0,
     onChangeStep,
@@ -41,18 +63,74 @@ export default function Stepper({
 
     const currentStep = steps[currentStepIndex] || steps[0];
 
-    const handleChangeStep = (newStep: number) => {
-        if (!currentStep.isEligibleNextStep) return;
-        setCurrentStepIndex(newStep);
-        onChangeStep?.(newStep);
+    const handleChangeStep = useCallback(
+        (newStep: number) => {
+            if (!currentStep.isEligibleNextStep) return;
+            setCurrentStepIndex(newStep);
+            onChangeStep?.(newStep);
 
-        if (!completedSteps.includes(newStep)) {
-            setCompletedSteps((prevSteps) => [...prevSteps, newStep]);
+            if (!completedSteps.includes(newStep)) {
+                setCompletedSteps((prevSteps) => [...prevSteps, newStep]);
+            }
+        },
+        [completedSteps, currentStep.isEligibleNextStep, onChangeStep]
+    );
+
+    const handleNextStep = useCallback(() => {
+        const isLastStep = currentStepIndex === steps.length - 1;
+
+        if (isLastStep) {
+            onFinish?.();
+        } else {
+            setCurrentStepIndex((prevStep) => prevStep + 1);
+
+            if (!completedSteps.includes(currentStepIndex)) {
+                setCompletedSteps((prevSteps) => [
+                    ...prevSteps,
+                    currentStepIndex
+                ]);
+            }
         }
-    };
+    }, [completedSteps, currentStepIndex, onFinish, steps]);
+
+    const handlePrevStep = useCallback(() => {
+        setCurrentStepIndex((prevStep) => prevStep - 1);
+
+        if (!completedSteps.includes(currentStepIndex)) {
+            setCompletedSteps((prevSteps) => [...prevSteps, currentStepIndex]);
+        }
+    }, [completedSteps, currentStepIndex]);
+
+    const isFirstStep = currentStepIndex === 0;
+    const isLastStep = currentStepIndex === steps.length - 1;
+
+    const value = useMemo<StepperContextProps>(
+        () => ({
+            steps,
+            defaultStep,
+            onChangeStep: handleChangeStep,
+            handleNextStep,
+            handlePrevStep,
+            onFinish,
+            step: currentStepIndex,
+            isFirstStep,
+            isLastStep
+        }),
+        [
+            currentStepIndex,
+            defaultStep,
+            handleChangeStep,
+            handleNextStep,
+            handlePrevStep,
+            isFirstStep,
+            isLastStep,
+            onFinish,
+            steps
+        ]
+    );
 
     return (
-        <>
+        <StepperProvider value={value}>
             <div className="mx-4 py-10">
                 <div className="flex items-center">
                     {steps.map((stepItem, index) => {
@@ -75,7 +153,7 @@ export default function Stepper({
 
                         const isLastItem = index === steps.length - 1;
 
-                        const isCompletedStep = completedSteps.includes(index);
+                        const isCompletedStep = index < currentStepIndex;
 
                         return (
                             <React.Fragment key={labelKey}>
@@ -86,14 +164,17 @@ export default function Stepper({
                                             'text-white': isActive
                                         }
                                     ])}
-                                    onClick={() => handleChangeStep(index)}
                                 >
                                     <div
                                         className={clsx([
-                                            'rounded-full transition duration-500 ease-in-out h-12 w-12 py-3 border-2 border-blue-600 flex justify-center items-center',
+                                            'rounded-full transition duration-500 ease-in-out h-12 w-12 py-3 border-2 flex justify-center items-center',
                                             {
-                                                'bg-blue-600': isActive,
+                                                'bg-blue-600':
+                                                    isActive || isCompletedStep,
+                                                'border-blue-600':
+                                                    isActive || isCompletedStep,
                                                 'text-gray-400': !isActive,
+                                                'text-white': isCompletedStep,
                                                 'pointer-events-none':
                                                     isEligibleToNextStep,
                                                 'hover:opacity-85':
@@ -101,14 +182,17 @@ export default function Stepper({
                                             }
                                         ])}
                                     >
-                                        <User />
+                                        {isCompletedStep ? <Check /> : <User />}
                                     </div>
                                     <div
                                         className={clsx([
                                             'absolute top-0 -ml-10 text-center mt-16 w-32 text-xs font-medium uppercase ',
                                             {
-                                                'text-gray-400': !isActive,
-                                                'text-blue-600': isActive
+                                                'text-gray-400':
+                                                    !isActive &&
+                                                    !isCompletedStep,
+                                                'text-blue-600':
+                                                    isActive || isCompletedStep
                                             }
                                         ])}
                                     >
@@ -216,6 +300,6 @@ export default function Stepper({
                     );
                 })}
             </div>
-        </>
+        </StepperProvider>
     );
 }

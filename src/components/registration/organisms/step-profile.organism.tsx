@@ -14,6 +14,8 @@ import {
     ClientProfileFormState,
     useClientRegistrationFormWizard
 } from '@/stores/client-registration-form-wizard.store';
+import { useStepperContext } from '@/components/shared/organisms/stepper.organism';
+import { Button } from '@/components/ui/button';
 
 const formSchema = z.object({
     name: z.string().nonempty(),
@@ -46,37 +48,47 @@ const BLOOD_TYPES: SelectOptions = [
 ];
 
 const StepProfile = () => {
-    async function handleSubmit(data: FieldValues) {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve(data);
-            }, 4000);
-        });
-    }
+    const stepperContext = useStepperContext();
 
     const setIsValidProfile = useClientRegistrationFormWizard(
         (state) => state.setIsValidProfile
     );
 
+    const setProfileForm = useClientRegistrationFormWizard(
+        (state) => state.setProfileForm
+    );
+
+    const defaultProfileForm = useClientRegistrationFormWizard(
+        (state) => state.profileState
+    );
+
+    function handleSubmit(data: FieldValues) {
+        setProfileForm({
+            ...data,
+            dob: new Date(data.dob)
+        });
+
+        stepperContext?.handleNextStep();
+    }
+
     return (
         <MotalentForm<FieldValues, object, FieldValues>
-            onSubmit={async (data) => await handleSubmit(data)}
+            onSubmit={(data) => {
+                handleSubmit(data);
+            }}
             resolver={zodResolver(formSchema)}
             defaultValues={{
-                name: '',
-                address: '',
-                age: '',
-                blood_type: '',
-                dob: '',
-                gender: ''
+                ...defaultProfileForm,
+                dob: defaultProfileForm.dob?.toISOString().split('T')[0]
             }}
             mode="onChange"
             reValidateMode="onChange"
-            onIsValid={(value) => {
-                setIsValidProfile(value);
+            onInvalid={() => {
+                setIsValidProfile(false);
             }}
+            onValid={() => setIsValidProfile(true)}
         >
-            {({ control }) => (
+            {({ control, formState }) => (
                 <div className="flex flex-col gap-4">
                     <div className="flex items-center justify-center gap-x-5">
                         <div className="w-full">
@@ -185,20 +197,46 @@ const StepProfile = () => {
                             <FormField
                                 control={control}
                                 name="gender"
+                                defaultValue="male"
                                 render={({ field }) => (
                                     <MotalentFormItem
                                         label="Gender"
                                         description="Please choose your gender"
                                     >
-                                        <MotalentInput
+                                        <MotalentSelect
                                             {...field}
                                             value={field.value}
-                                            placeholder="Input your gender"
+                                            onValueChange={(value) => {
+                                                field.onChange(value);
+                                            }}
+                                            options={[
+                                                {
+                                                    label: 'Female',
+                                                    value: 'female'
+                                                },
+                                                {
+                                                    label: 'Male',
+                                                    value: 'male'
+                                                }
+                                            ]}
                                         />
                                     </MotalentFormItem>
                                 )}
                             />
                         </div>
+                    </div>
+
+                    <div className="flex w-full justify-end self-end gap-3">
+                        <Button
+                            disabled={stepperContext?.isFirstStep}
+                            onClick={() => stepperContext?.onChangeStep?.(-1)}
+                        >
+                            Prev
+                        </Button>
+
+                        <Button disabled={!formState.isValid} type="submit">
+                            Next
+                        </Button>
                     </div>
                 </div>
             )}

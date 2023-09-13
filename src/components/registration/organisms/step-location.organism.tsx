@@ -1,23 +1,20 @@
+import { useStepperContext } from '@/components/shared/organisms/stepper.organism';
 import { Button } from '@/components/ui/button';
-import { useClientRegistrationFormWizard } from '@/stores/client-registration-form-wizard.store';
-import React from 'react';
 
 export default function StepLocation() {
-    const setIsValidLocation = useClientRegistrationFormWizard(
-        (state) => state.setIsValidLocation
-    );
-    const setIsValidPreference = useClientRegistrationFormWizard(
-        (state) => state.setIsValidPreference
-    );
+    const stepperContext = useStepperContext();
 
     return (
         <div>
+            <Button onClick={() => stepperContext?.handlePrevStep()}>
+                Prev
+            </Button>
+
             <Button
-                onClick={() => {
-                    setIsValidLocation(true);
-                }}
+                onClick={() => stepperContext?.handleNextStep()}
+                type="submit"
             >
-                Validate Me
+                Next
             </Button>
         </div>
     );
