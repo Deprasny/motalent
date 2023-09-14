@@ -9,28 +9,21 @@ import MotalentSelect from '@/components/shared/molecules/motalent-select';
 import { InferZodSchema } from '@/interfaces/zod.interface';
 import { useClientRegistrationFormWizard } from '@/stores/client-registration-form-wizard.store';
 import { FormField } from '@/components/ui/form';
-import { SelectOptions } from '@/interfaces/global.interface';
+import {
+    useQueryGetDistricts,
+    useQueryGetProvinces,
+    useQueryGetRegencies,
+    useQueryGetVillages
+} from '@/hooks/general';
+import { ControllerRenderProps, useFormContext } from 'react-hook-form';
 
 type FieldValues = InferZodSchema<typeof formSchema>;
 
-const EXAMPLE: SelectOptions = [
-    {
-        label: 'example 1',
-        value: '1'
-    },
-    {
-        label: 'example 2',
-        value: '2'
-    },
-    {
-        label: 'example 3',
-        value: '3'
-    },
-    {
-        label: 'example 4',
-        value: '4'
-    }
-];
+type TypeLocationChange =
+    | 'province_id'
+    | 'regency_id'
+    | 'district_id'
+    | 'village_id';
 
 const formSchema = z.object({
     province_id: z.string().nonempty(),
@@ -73,103 +66,9 @@ export default function StepLocation() {
             }}
             onValid={() => setIsValidLocation(true)}
         >
-            {({ control, formState }) => (
+            {({ formState }) => (
                 <div className="flex flex-col gap-4">
-                    <div className="flex items-center justify-center gap-x-5">
-                        <div className="w-full">
-                            <FormField
-                                control={control}
-                                name="province_id"
-                                render={({ field }) => (
-                                    <MotalentFormItem
-                                        label="Province"
-                                        description="Please choose your province"
-                                    >
-                                        <MotalentSelect
-                                            defaultValue={field.value}
-                                            value={field.value}
-                                            onValueChange={(value) => {
-                                                field.onChange(value);
-                                            }}
-                                            ref={field.ref}
-                                            options={EXAMPLE}
-                                        />
-                                    </MotalentFormItem>
-                                )}
-                            />
-                        </div>
-
-                        <div className="w-full">
-                            <FormField
-                                control={control}
-                                name="regency_id"
-                                render={({ field }) => (
-                                    <MotalentFormItem
-                                        label="Regency"
-                                        description="Please choose your regency"
-                                    >
-                                        <MotalentSelect
-                                            defaultValue={field.value}
-                                            value={field.value}
-                                            onValueChange={(value) => {
-                                                field.onChange(value);
-                                            }}
-                                            ref={field.ref}
-                                            options={EXAMPLE}
-                                        />
-                                    </MotalentFormItem>
-                                )}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="flex items-center justify-center gap-x-5">
-                        <div className="w-full">
-                            <FormField
-                                control={control}
-                                name="district_id"
-                                render={({ field }) => (
-                                    <MotalentFormItem
-                                        label="District"
-                                        description="Please choose your district"
-                                    >
-                                        <MotalentSelect
-                                            defaultValue={field.value}
-                                            value={field.value}
-                                            onValueChange={(value) => {
-                                                field.onChange(value);
-                                            }}
-                                            ref={field.ref}
-                                            options={EXAMPLE}
-                                        />
-                                    </MotalentFormItem>
-                                )}
-                            />
-                        </div>
-
-                        <div className="w-full">
-                            <FormField
-                                control={control}
-                                name="village_id"
-                                render={({ field }) => (
-                                    <MotalentFormItem
-                                        label="Village"
-                                        description="Please choose your village"
-                                    >
-                                        <MotalentSelect
-                                            defaultValue={field.value}
-                                            value={field.value}
-                                            onValueChange={(value) => {
-                                                field.onChange(value);
-                                            }}
-                                            ref={field.ref}
-                                            options={EXAMPLE}
-                                        />
-                                    </MotalentFormItem>
-                                )}
-                            />
-                        </div>
-                    </div>
+                    <LocationForms />
 
                     <div className="flex w-full justify-end self-end gap-3">
                         <Button
@@ -186,5 +85,162 @@ export default function StepLocation() {
                 </div>
             )}
         </MotalentForm>
+    );
+}
+
+function LocationForms() {
+    const { control, getValues, setValue } = useFormContext<FieldValues>();
+
+    const setLocationForm = useClientRegistrationFormWizard(
+        (state) => state.setLocationForm
+    );
+
+    const { data: provinceOptions, isFetching: isLoadingProvinceOptions } =
+        useQueryGetProvinces();
+
+    const { data: regencyOptions, isFetching: isLoadingRegencyOptions } =
+        useQueryGetRegencies(getValues('province_id'));
+
+    const { data: districtOptions, isFetching: isLoadingDistrictOptions } =
+        useQueryGetDistricts(getValues('regency_id'));
+
+    const { data: villageOptions, isFetching: isLoadingVillageOptions } =
+        useQueryGetVillages(getValues('district_id'));
+
+    function handleLocationChange<T extends keyof FieldValues>(
+        field: ControllerRenderProps<FieldValues, T>,
+        type: TypeLocationChange
+    ) {
+        return function (value: string) {
+            setLocationForm({
+                ...getValues(),
+                [type]: value
+            });
+
+            field.onChange(value);
+
+            if (type === 'province_id') {
+                setValue('regency_id', '');
+                setValue('district_id', '');
+                setValue('village_id', '');
+            }
+
+            if (type === 'regency_id') {
+                setValue('district_id', '');
+                setValue('village_id', '');
+            }
+
+            if (type === 'district_id') {
+                setValue('village_id', '');
+            }
+        };
+    }
+
+    return (
+        <>
+            <div className="flex items-center justify-center gap-x-5">
+                <div className="w-full">
+                    <FormField
+                        control={control}
+                        name="province_id"
+                        render={({ field }) => (
+                            <MotalentFormItem
+                                label="Province"
+                                description="Please choose your province"
+                            >
+                                <MotalentSelect
+                                    defaultValue={field.value}
+                                    value={field.value}
+                                    isLoading={isLoadingProvinceOptions}
+                                    onValueChange={handleLocationChange(
+                                        field,
+                                        'province_id'
+                                    )}
+                                    ref={field.ref}
+                                    options={provinceOptions || []}
+                                    placeholder="Select Province"
+                                />
+                            </MotalentFormItem>
+                        )}
+                    />
+                </div>
+
+                <div className="w-full">
+                    <FormField
+                        control={control}
+                        name="regency_id"
+                        render={({ field }) => (
+                            <MotalentFormItem
+                                label="Regency"
+                                description="Please choose your regency"
+                            >
+                                <MotalentSelect
+                                    defaultValue={field.value}
+                                    value={field.value}
+                                    onValueChange={handleLocationChange(
+                                        field,
+                                        'regency_id'
+                                    )}
+                                    ref={field.ref}
+                                    isLoading={isLoadingRegencyOptions}
+                                    options={regencyOptions}
+                                />
+                            </MotalentFormItem>
+                        )}
+                    />
+                </div>
+            </div>
+
+            <div className="flex items-center justify-center gap-x-5">
+                <div className="w-full">
+                    <FormField
+                        control={control}
+                        name="district_id"
+                        render={({ field }) => (
+                            <MotalentFormItem
+                                label="District"
+                                description="Please choose your district"
+                            >
+                                <MotalentSelect
+                                    defaultValue={field.value}
+                                    value={field.value}
+                                    onValueChange={handleLocationChange(
+                                        field,
+                                        'district_id'
+                                    )}
+                                    ref={field.ref}
+                                    isLoading={isLoadingDistrictOptions}
+                                    options={districtOptions}
+                                />
+                            </MotalentFormItem>
+                        )}
+                    />
+                </div>
+
+                <div className="w-full">
+                    <FormField
+                        control={control}
+                        name="village_id"
+                        render={({ field }) => (
+                            <MotalentFormItem
+                                label="Village"
+                                description="Please choose your village"
+                            >
+                                <MotalentSelect
+                                    defaultValue={field.value}
+                                    value={field.value}
+                                    onValueChange={handleLocationChange(
+                                        field,
+                                        'village_id'
+                                    )}
+                                    isLoading={isLoadingVillageOptions}
+                                    options={villageOptions}
+                                />
+                            </MotalentFormItem>
+                        )}
+                    />
+                </div>
+            </div>
+        </>
     );
 }

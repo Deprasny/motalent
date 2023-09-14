@@ -1,6 +1,6 @@
 export type SelectOption = {
     label: string;
-    value: string;
+    value: any;
 };
 
 export type SelectOptions = SelectOption[];
