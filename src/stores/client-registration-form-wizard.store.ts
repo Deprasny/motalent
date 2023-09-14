@@ -12,9 +12,10 @@ export interface ClientProfileFormState {
 interface ClientProfileFormStore extends ClientProfileFormState {}
 
 interface ClientLocationFormState {
-    province_id: string | null;
-    city_id: string | null;
-    district_id: string | null;
+    province_id: string;
+    regency_id: string;
+    village_id: string;
+    district_id: string;
 }
 
 interface ClientLocationFormStore extends ClientLocationFormState {}
@@ -56,17 +57,18 @@ interface UseClientRegistrationFormWizardStore {
 
 const INITIAL_STATE: UseClientRegistrationFormWizardStore = {
     profileState: {
-        address: undefined,
-        age: undefined,
-        blood_type: undefined,
+        address: '',
+        age: '',
+        blood_type: '',
         dob: undefined,
-        gender: undefined,
-        name: undefined
+        gender: '',
+        name: ''
     },
     locationState: {
-        city_id: null,
-        district_id: null,
-        province_id: null
+        province_id: '',
+        regency_id: '',
+        district_id: '',
+        village_id: ''
     },
     preferenceState: {
         category_ids: null,

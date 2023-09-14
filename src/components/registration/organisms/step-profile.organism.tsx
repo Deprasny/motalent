@@ -186,13 +186,21 @@ const StepProfile = () => {
                                     >
                                         <MotalentInput
                                             {...field}
-                                            value={field.value?.toString()}
+                                            onChange={(value) => {
+                                                field.onChange(value);
+                                            }}
+                                            value={
+                                                field.value
+                                                    ? field.value.toString()
+                                                    : ''
+                                            }
                                             type="date"
                                         />
                                     </MotalentFormItem>
                                 )}
                             />
                         </div>
+
                         <div className="w-full">
                             <FormField
                                 control={control}
@@ -227,10 +235,7 @@ const StepProfile = () => {
                     </div>
 
                     <div className="flex w-full justify-end self-end gap-3">
-                        <Button
-                            disabled={stepperContext?.isFirstStep}
-                            onClick={() => stepperContext?.onChangeStep?.(-1)}
-                        >
+                        <Button disabled={stepperContext?.isFirstStep}>
                             Prev
                         </Button>
 
