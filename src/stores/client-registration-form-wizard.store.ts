@@ -21,16 +21,16 @@ interface ClientLocationFormState {
 interface ClientLocationFormStore extends ClientLocationFormState {}
 
 interface ClientSeachPreferenceFormState {
-    category_ids: string[] | null;
-    province_ids: string[] | null;
-    city_ids: string[] | null;
-    district_ids: string[] | null;
-    min_price: number | null;
-    max_price: number | null;
-    min_age: number | null;
-    max_age: number | null;
-    is_negotiable: boolean | null;
-    is_dp: boolean | null;
+    category_ids: string;
+    province_ids: string;
+    city_ids: string;
+    district_id: string;
+    min_price: number;
+    max_price: number;
+    min_age: number;
+    max_age: number;
+    is_negotiable: boolean;
+    is_dp: boolean;
 }
 
 interface ClientSeachPreferenceFormStore
@@ -71,16 +71,16 @@ const INITIAL_STATE: UseClientRegistrationFormWizardStore = {
         village_id: ''
     },
     preferenceState: {
-        category_ids: null,
-        city_ids: null,
-        district_ids: null,
+        category_ids: '',
+        city_ids: '',
+        district_id: '',
         is_dp: false,
         is_negotiable: false,
-        max_age: null,
-        max_price: null,
-        min_age: null,
-        min_price: null,
-        province_ids: null
+        max_age: 0,
+        max_price: 0,
+        min_age: 0,
+        min_price: 0,
+        province_ids: ''
     },
     isValidProfile: false,
     setIsValidProfile: (value) => {},
