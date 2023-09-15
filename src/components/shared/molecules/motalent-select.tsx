@@ -9,24 +9,38 @@ import {
 import { SelectOptions } from '@/interfaces/global.interface';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import React from 'react';
+import { LoaderIcon } from 'lucide-react';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface MotalentSelectProps extends SelectPrimitive.SelectProps {
     options?: SelectOptions;
+    isLoading?: boolean;
+    placeholder?: string;
+    height?: string;
 }
 
 const MotalentSelect = forwardRef<HTMLButtonElement, MotalentSelectProps>(
-    ({ options, ...restProps }, ref) => {
+    (
+        { options, isLoading, placeholder, height = 'h-[200px]', ...restProps },
+        ref
+    ) => {
         return (
             <Select {...restProps}>
                 <SelectTrigger ref={ref}>
-                    <SelectValue placeholder="Theme" />
+                    <SelectValue placeholder={placeholder || 'Select'} />
+
+                    {isLoading && (
+                        <LoaderIcon className="w-5 h-5 text-gray-400 animate-spin" />
+                    )}
                 </SelectTrigger>
                 <SelectContent>
-                    {options?.map(({ label, value }, index) => (
-                        <SelectItem key={`${index}_${label}`} value={value}>
-                            {label}
-                        </SelectItem>
-                    ))}
+                    <ScrollArea className={height}>
+                        {options?.map(({ label, value }, index) => (
+                            <SelectItem key={`${index}_${label}`} value={value}>
+                                {label}
+                            </SelectItem>
+                        ))}
+                    </ScrollArea>
                 </SelectContent>
             </Select>
         );

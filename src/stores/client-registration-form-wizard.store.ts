@@ -12,24 +12,26 @@ export interface ClientProfileFormState {
 interface ClientProfileFormStore extends ClientProfileFormState {}
 
 interface ClientLocationFormState {
-    province_id: string | null;
-    city_id: string | null;
-    district_id: string | null;
+    province_id: string;
+    regency_id: string;
+    village_id: string;
+    district_id: string;
 }
 
 interface ClientLocationFormStore extends ClientLocationFormState {}
 
 interface ClientSeachPreferenceFormState {
-    category_ids: string[] | null;
-    province_ids: string[] | null;
-    city_ids: string[] | null;
-    district_ids: string[] | null;
-    min_price: number | null;
-    max_price: number | null;
-    min_age: number | null;
-    max_age: number | null;
-    is_negotiable: boolean | null;
-    is_dp: boolean | null;
+    category_ids: string;
+    province_id: string;
+    regency_id: string;
+    district_id: string;
+    village_id: string;
+    min_price: number;
+    max_price: number;
+    min_age: number;
+    max_age: number;
+    is_negotiable: boolean;
+    is_dp: boolean;
 }
 
 interface ClientSeachPreferenceFormStore
@@ -38,48 +40,58 @@ interface ClientSeachPreferenceFormStore
 interface UseClientRegistrationFormWizardStore {
     profileState: ClientProfileFormStore;
     locationState: ClientLocationFormStore;
-    preferenceState: ClientSeachPreferenceFormStore;
+    preferencesState: ClientSeachPreferenceFormStore[];
 
     isValidProfile: boolean;
     isValidLocation: boolean;
     isValidPreference: boolean;
 
+    collapsibleIndexs: number[];
+
     setProfileForm: (state: Partial<ClientProfileFormState>) => void;
-    setSearchPreferenceForm: (
+    setSearchPreferencesForm: (
+        index: number,
         state: Partial<ClientSeachPreferenceFormState>
     ) => void;
     setLocationForm: (state: Partial<ClientLocationFormState>) => void;
     setIsValidProfile: (bool: boolean) => void;
     setIsValidLocation: (bool: boolean) => void;
     setIsValidPreference: (bool: boolean) => void;
+    setPushPreferencesForm: (state: ClientSeachPreferenceFormState) => void;
+    setRemovePreferencesForm: (index: number) => void;
+    toggleCollapsible: (index: number) => void;
 }
 
-const INITIAL_STATE: UseClientRegistrationFormWizardStore = {
+export const INITIAL_PREF_STATE: ClientSeachPreferenceFormState = {
+    category_ids: '',
+    regency_id: '',
+    district_id: '',
+    village_id: '',
+    is_dp: false,
+    is_negotiable: false,
+    max_age: 0,
+    max_price: 0,
+    min_age: 0,
+    min_price: 0,
+    province_id: ''
+};
+
+export const INITIAL_STATE: UseClientRegistrationFormWizardStore = {
     profileState: {
-        address: undefined,
-        age: undefined,
-        blood_type: undefined,
+        address: '',
+        age: '',
+        blood_type: '',
         dob: undefined,
-        gender: undefined,
-        name: undefined
+        gender: '',
+        name: ''
     },
     locationState: {
-        city_id: null,
-        district_id: null,
-        province_id: null
+        province_id: '',
+        regency_id: '',
+        district_id: '',
+        village_id: ''
     },
-    preferenceState: {
-        category_ids: null,
-        city_ids: null,
-        district_ids: null,
-        is_dp: false,
-        is_negotiable: false,
-        max_age: null,
-        max_price: null,
-        min_age: null,
-        min_price: null,
-        province_ids: null
-    },
+    preferencesState: [],
     isValidProfile: false,
     setIsValidProfile: (value) => {},
 
@@ -91,19 +103,23 @@ const INITIAL_STATE: UseClientRegistrationFormWizardStore = {
 
     setProfileForm: (state) => {},
     setLocationForm: (state) => {},
-    setSearchPreferenceForm: (payload) => {}
+    setSearchPreferencesForm: (index, payload) => {},
+    setPushPreferencesForm: (state) => {},
+    setRemovePreferencesForm: (index) => {},
+
+    collapsibleIndexs: [],
+    toggleCollapsible: (index) => {}
 };
 
 export const useClientRegistrationFormWizard =
     create<UseClientRegistrationFormWizardStore>((set, get) => {
         return {
             locationState: INITIAL_STATE.locationState,
-            preferenceState: INITIAL_STATE.preferenceState,
+            preferencesState: INITIAL_STATE.preferencesState,
             profileState: INITIAL_STATE.profileState,
             isValidLocation: INITIAL_STATE.isValidLocation,
             isValidPreference: INITIAL_STATE.isValidPreference,
             isValidProfile: INITIAL_STATE.isValidProfile,
-
             setIsValidLocation: (v) =>
                 set({
                     isValidLocation: v
@@ -116,29 +132,78 @@ export const useClientRegistrationFormWizard =
                 set({
                     isValidProfile: v
                 }),
-
             setLocationForm: (state) =>
-                set((prev) => ({
+                set({
                     locationState: {
-                        ...prev.locationState,
+                        ...get().locationState,
                         ...state
                     }
-                })),
+                }),
             setProfileForm: (state) =>
-                set((prev) => ({
-                    ...prev,
+                set({
                     profileState: {
-                        ...prev.profileState,
+                        ...get().profileState,
                         ...state
                     }
-                })),
-            setSearchPreferenceForm: (state) =>
-                set((prev) => ({
-                    ...prev,
-                    preferenceState: {
-                        ...prev.preferenceState,
-                        ...state
+                }),
+            setSearchPreferencesForm: (index, preference) => {
+                const oldPreferences = get().preferencesState;
+                const updatedPreferences = oldPreferences.map((pref, i) => {
+                    if (i === index) {
+                        return {
+                            ...pref,
+                            ...preference
+                        };
                     }
-                }))
+                    return pref;
+                });
+
+                set({
+                    preferencesState: updatedPreferences
+                });
+            },
+            setPushPreferencesForm: (state) => {
+                const oldPreferences = get().preferencesState;
+                const updatedPreferences = [...oldPreferences, state];
+
+                set({
+                    preferencesState: updatedPreferences
+                });
+            },
+            setRemovePreferencesForm: (index) => {
+                const oldPreferences = get().preferencesState;
+                const updatedPreferences = oldPreferences.filter(
+                    (_, i) => i !== index
+                );
+
+                set({
+                    preferencesState: updatedPreferences
+                });
+            },
+
+            collapsibleIndexs: [],
+            toggleCollapsible: (index) => {
+                set((prev) => {
+                    const updatedCollapsibles = [...prev.collapsibleIndexs];
+                    const isExist = updatedCollapsibles.includes(index);
+
+                    if (isExist) {
+                        const filteredCollapsibles = updatedCollapsibles.filter(
+                            (i) => i !== index
+                        );
+                        return {
+                            ...prev,
+                            collapsibleIndexs: filteredCollapsibles
+                        };
+                    }
+
+                    updatedCollapsibles.push(index);
+
+                    return {
+                        ...prev,
+                        collapsibleIndexs: updatedCollapsibles
+                    };
+                });
+            }
         };
     });
