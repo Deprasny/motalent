@@ -1,3 +1,4 @@
+import MotalentCard from '@/components/shared/molecules/motalent-card';
 import MotalentForm from '@/components/shared/molecules/motalent-form';
 import MotalentFormItem from '@/components/shared/molecules/motalent-form-item';
 import MotalentInput from '@/components/shared/molecules/motalent-input';
@@ -12,6 +13,7 @@ import {
 } from '@/components/ui/collapsible';
 import { FormField } from '@/components/ui/form';
 import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
 import {
     useQueryGetDistricts,
     useQueryGetProvinces,
@@ -177,22 +179,13 @@ export default function StepPreference() {
                         }
 
                         return (
-                            <div className="flex flex-col gap-4">
-                                <div className="pt-4">
-                                    <h1 className="inline-flex items-center gap-x-2 text-2xl font-semibold text-gray-800">
-                                        <SearchIcon className="w-6 h-6 text-gray-500" />
-                                        <span className="text-gray-500">
-                                            Search Preferences
-                                        </span>{' '}
-                                    </h1>
-                                    <p className="text-gray-500">
-                                        Please choose your search preferences to
-                                        help us find the best talent for you!
-                                        Dont worry, you can add more later.
-                                    </p>
-                                </div>
+                            <MotalentCard
+                                label="Preference"
+                                description="input your preference"
+                            >
+                                <Separator />
 
-                                <div className="flex flex-col gap-8">
+                                <div className="flex flex-col gap-8 mt-5">
                                     {fields.map(({ id }, index) => (
                                         <PreferenceCollapsible
                                             key={`${index}-${id}`}
@@ -469,7 +462,7 @@ export default function StepPreference() {
                                     ))}
                                 </div>
 
-                                <div className="flex flex-col w-full">
+                                <div className="flex flex-col w-full my-5">
                                     <Button
                                         type="button"
                                         variant="outline"
@@ -498,7 +491,7 @@ export default function StepPreference() {
                                         Next
                                     </Button>
                                 </div>
-                            </div>
+                            </MotalentCard>
                         );
                     }}
                 </PreferenceArrayForms>
@@ -562,14 +555,12 @@ function PreferenceCollapsible({
             open={_isOpen}
             disabled={isDisabled}
             onOpenChange={onOpenChange}
-            className="flex flex-col border border-gray-200 rounded-md px-8 py-4"
             {...rest}
         >
             <div className="flex items-center justify-between space-x-4">
-                <h1 className="text-2xl font-bold">
+                <h1 className="text-lg ">
                     Preference {currentIndex + 1} of {fieldsLength}
                 </h1>
-
                 <div className="flex items-center space-x-4">
                     <Button
                         type="button"
@@ -702,8 +693,7 @@ function LocationForms({ currentIndex = 0 }: { currentIndex?: number }) {
                                 description="Please choose your province"
                             >
                                 <MotalentSelect
-                                    defaultValue={field.value}
-                                    value={field.value}
+                                    value={field.value || undefined}
                                     isLoading={isLoadingProvinceOptions}
                                     onValueChange={handleLocationChange(
                                         field,
@@ -733,8 +723,7 @@ function LocationForms({ currentIndex = 0 }: { currentIndex?: number }) {
                                 description="Please choose your regency"
                             >
                                 <MotalentSelect
-                                    defaultValue={field.value}
-                                    value={field.value}
+                                    value={field.value || undefined}
                                     onValueChange={handleLocationChange(
                                         field,
                                         'regency_id'
@@ -742,6 +731,10 @@ function LocationForms({ currentIndex = 0 }: { currentIndex?: number }) {
                                     ref={field.ref}
                                     isLoading={isLoadingRegencyOptions}
                                     options={regencyOptions}
+                                    disabled={
+                                        !!!getPreferenceByIndexValues()
+                                            .province_id
+                                    }
                                 />
                             </MotalentFormItem>
                         )}
@@ -765,8 +758,7 @@ function LocationForms({ currentIndex = 0 }: { currentIndex?: number }) {
                                 description="Please choose your district"
                             >
                                 <MotalentSelect
-                                    defaultValue={field.value}
-                                    value={field.value}
+                                    value={field.value || undefined}
                                     onValueChange={handleLocationChange(
                                         field,
                                         'district_id'
@@ -774,6 +766,10 @@ function LocationForms({ currentIndex = 0 }: { currentIndex?: number }) {
                                     ref={field.ref}
                                     isLoading={isLoadingDistrictOptions}
                                     options={districtOptions}
+                                    disabled={
+                                        !!!getPreferenceByIndexValues()
+                                            .regency_id
+                                    }
                                 />
                             </MotalentFormItem>
                         )}
@@ -795,14 +791,17 @@ function LocationForms({ currentIndex = 0 }: { currentIndex?: number }) {
                                 description="Please choose your village"
                             >
                                 <MotalentSelect
-                                    defaultValue={field.value}
-                                    value={field.value}
+                                    value={field.value || undefined}
                                     onValueChange={handleLocationChange(
                                         field,
                                         'village_id'
                                     )}
                                     isLoading={isLoadingVillageOptions}
                                     options={villageOptions}
+                                    disabled={
+                                        !!!getPreferenceByIndexValues()
+                                            .district_id
+                                    }
                                 />
                             </MotalentFormItem>
                         )}

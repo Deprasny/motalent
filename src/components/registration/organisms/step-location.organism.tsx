@@ -17,6 +17,7 @@ import {
 } from '@/hooks/general';
 import { ControllerRenderProps, useFormContext } from 'react-hook-form';
 import { MapIcon, PinIcon } from 'lucide-react';
+import MotalentCard from '@/components/shared/molecules/motalent-card';
 
 type FieldValues = InferZodSchema<typeof formSchema>;
 
@@ -54,52 +55,40 @@ export default function StepLocation() {
     }
 
     return (
-        <MotalentForm<FieldValues, object, FieldValues>
-            onSubmit={(data) => {
-                handleSubmit(data);
-            }}
-            resolver={zodResolver(formSchema)}
-            defaultValues={defaultLocationForm}
-            mode="onChange"
-            reValidateMode="onChange"
-            onInvalid={() => {
-                setIsValidLocation(false);
-            }}
-            onValid={() => setIsValidLocation(true)}
-        >
-            {({ formState }) => (
-                <div className="flex flex-col gap-4">
-                    <div className="pt-4">
-                        <h1 className="inline-flex items-center gap-x-2 text-2xl font-semibold text-gray-800">
-                            <MapIcon className="w-6 h-6 text-gray-500" />
-                            <span className="text-gray-500">
-                                Location Details
-                            </span>{' '}
-                        </h1>
-                        <p className="text-gray-500">
-                            Please fill in the following information to complete
-                            your profile and continue to the next step. It will
-                            help us to find the best talent for you.
-                        </p>
+        <MotalentCard label="Profile" description="input your profile">
+            <MotalentForm<FieldValues, object, FieldValues>
+                onSubmit={(data) => {
+                    handleSubmit(data);
+                }}
+                resolver={zodResolver(formSchema)}
+                defaultValues={defaultLocationForm}
+                mode="onChange"
+                reValidateMode="onChange"
+                onInvalid={() => {
+                    setIsValidLocation(false);
+                }}
+                onValid={() => setIsValidLocation(true)}
+            >
+                {({ formState }) => (
+                    <div className="flex flex-col gap-4">
+                        <LocationForms />
+
+                        <div className="flex w-full justify-end self-end gap-3">
+                            <Button
+                                type="button"
+                                onClick={() => stepperContext?.handlePrevStep()}
+                            >
+                                Prev
+                            </Button>
+
+                            <Button disabled={!formState.isValid} type="submit">
+                                Next
+                            </Button>
+                        </div>
                     </div>
-
-                    <LocationForms />
-
-                    <div className="flex w-full justify-end self-end gap-3">
-                        <Button
-                            type="button"
-                            onClick={() => stepperContext?.handlePrevStep()}
-                        >
-                            Prev
-                        </Button>
-
-                        <Button disabled={!formState.isValid} type="submit">
-                            Next
-                        </Button>
-                    </div>
-                </div>
-            )}
-        </MotalentForm>
+                )}
+            </MotalentForm>
+        </MotalentCard>
     );
 }
 
@@ -164,8 +153,7 @@ function LocationForms() {
                                 description="Please choose your province"
                             >
                                 <MotalentSelect
-                                    defaultValue={field.value}
-                                    value={field.value}
+                                    value={field.value || undefined}
                                     isLoading={isLoadingProvinceOptions}
                                     onValueChange={handleLocationChange(
                                         field,
@@ -173,7 +161,6 @@ function LocationForms() {
                                     )}
                                     ref={field.ref}
                                     options={provinceOptions || []}
-                                    placeholder="Select Province"
                                 />
                             </MotalentFormItem>
                         )}
@@ -190,8 +177,7 @@ function LocationForms() {
                                 description="Please choose your regency"
                             >
                                 <MotalentSelect
-                                    defaultValue={field.value}
-                                    value={field.value}
+                                    value={field.value || undefined}
                                     onValueChange={handleLocationChange(
                                         field,
                                         'regency_id'
@@ -199,6 +185,7 @@ function LocationForms() {
                                     ref={field.ref}
                                     isLoading={isLoadingRegencyOptions}
                                     options={regencyOptions}
+                                    disabled={!!!watch('province_id')}
                                 />
                             </MotalentFormItem>
                         )}
@@ -217,8 +204,7 @@ function LocationForms() {
                                 description="Please choose your district"
                             >
                                 <MotalentSelect
-                                    defaultValue={field.value}
-                                    value={field.value}
+                                    value={field.value || undefined}
                                     onValueChange={handleLocationChange(
                                         field,
                                         'district_id'
@@ -226,6 +212,7 @@ function LocationForms() {
                                     ref={field.ref}
                                     isLoading={isLoadingDistrictOptions}
                                     options={districtOptions}
+                                    disabled={!!!watch('regency_id')}
                                 />
                             </MotalentFormItem>
                         )}
@@ -242,14 +229,14 @@ function LocationForms() {
                                 description="Please choose your village"
                             >
                                 <MotalentSelect
-                                    defaultValue={field.value}
-                                    value={field.value}
+                                    value={field.value || undefined}
                                     onValueChange={handleLocationChange(
                                         field,
                                         'village_id'
                                     )}
                                     isLoading={isLoadingVillageOptions}
                                     options={villageOptions}
+                                    disabled={!!!watch('district_id')}
                                 />
                             </MotalentFormItem>
                         )}

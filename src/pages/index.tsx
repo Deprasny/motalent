@@ -37,7 +37,7 @@ export default function Home() {
         []
     );
     return (
-        <div className="flex flex-col w-[800px] mx-auto my-8">
+        <div className="flex flex-col w-[1180px] mx-auto">
             <Stepper defaultStep={0} steps={steps} />
         </div>
     );

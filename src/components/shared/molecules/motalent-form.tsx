@@ -39,17 +39,6 @@ export default function MotalentForm<
         ...restProps
     });
 
-    // useEffect(() => {
-    //     const isValid = methods.formState.isValid;
-    //     if (isValid && onValid) {
-    //         onValid?.();
-    //     }
-
-    //     if (!isValid && onInvalid) {
-    //         onInvalid?.();
-    //     }
-    // }, [methods.formState.isValid]);
-
     return (
         <Form {...methods}>
             <form onSubmit={methods.handleSubmit(onSubmit)}>
