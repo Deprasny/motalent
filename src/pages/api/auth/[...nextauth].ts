@@ -1,4 +1,5 @@
-import NextAuth, { AuthOptions } from 'next-auth';
+import { AuthService } from '@/services/auth.service';
+import NextAuth, { AuthOptions, User } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 
 export const authOptions: AuthOptions = {
@@ -13,29 +14,34 @@ export const authOptions: AuthOptions = {
                 },
                 password: { label: 'Password', type: 'password' }
             },
-            authorize(credentials, req) {
+            async authorize(credentials, req) {
                 // Add logic here to look up the user from the credentials supplied
                 const { email, password } = credentials as {
                     email: string;
                     password: string;
                 };
 
-                if (email === 'jsmith@mail.com' && password === 'password') {
-                    // Any object returned will be saved in `user` property of the JWT
-                    return Promise.resolve({
-                        id: '1',
-                        email: 'jsmith@mail.com',
-                        image: 'https://avatars.githubusercontent.com/u/13997136?v=4',
-                        name: 'John Smith'
-                    });
-                } else {
-                    // If you return null or false then the credentials will be rejected
-                    return Promise.reject(
-                        new Error('Invalid username or password')
-                    ); // Redirect to error page
-                    // You can also Reject this callback with an Error or with a URL:
-                    // return Promise.reject(new Error('error message')) // Redirect to error page
-                    // return Promise.reject('/path/to/redirect')        // Redirect to a URL
+                try {
+                    const authService = new AuthService();
+
+                    const token = await authService.login(email, password);
+                    const profile = await authService.getProfile(token);
+
+                    const updatedProfile = profile;
+                    updatedProfile.accessToken = token;
+
+                    return Promise.resolve(updatedProfile);
+                } catch (error: any) {
+                    if (error.response) {
+                        return Promise.reject(
+                            new Error(
+                                error.response.data.message ||
+                                    'Something went wrong'
+                            )
+                        );
+                    }
+
+                    return Promise.reject(new Error('Something went wrong'));
                 }
             }
         })
@@ -45,6 +51,28 @@ export const authOptions: AuthOptions = {
     pages: {
         signIn: '/auth/login',
         error: '/auth/login' // Error code passed in query string as ?error=,
+    },
+    session: {
+        strategy: 'jwt'
+    },
+    callbacks: {
+        // Assigning encoded token from API to token created in the session
+        async jwt({ user: response, token, account }) {
+            if (account && response) {
+                token.accessToken = response.accessToken;
+                token.user = response;
+            }
+
+            return token;
+        },
+
+        // Extending session object
+        async session({ session, token }) {
+            session.accessToken = token.accessToken as string;
+            session.user = token.user as User;
+
+            return session;
+        }
     }
 };
 

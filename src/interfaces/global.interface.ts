@@ -4,3 +4,10 @@ export type SelectOption = {
 };
 
 export type SelectOptions = SelectOption[];
+
+export interface BaseResponse<T> {
+    status: 'success' | 'error';
+    message: string;
+    statusCode: number;
+    data: T;
+}
