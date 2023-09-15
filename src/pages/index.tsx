@@ -31,7 +31,7 @@ export default function Home() {
                 content: () => <StepLocation />
             },
             {
-                label: 'Preference',
+                label: 'Search Preferences',
                 isCustomStepActionButtons: true,
                 isEligibleNextStep: isValidPreference,
                 content: () => <StepPreference />
