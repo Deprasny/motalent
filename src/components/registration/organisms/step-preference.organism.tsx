@@ -4,7 +4,9 @@ import MotalentInput from '@/components/shared/molecules/motalent-input';
 import MotalentSelect from '@/components/shared/molecules/motalent-select';
 import { useStepperContext } from '@/components/shared/organisms/stepper.organism';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { FormField } from '@/components/ui/form';
+import { Label } from '@/components/ui/label';
 import {
     useQueryGetDistricts,
     useQueryGetProvinces,
@@ -14,6 +16,7 @@ import {
 import { InferZodSchema } from '@/interfaces/zod.interface';
 import { useClientRegistrationFormWizard } from '@/stores/client-registration-form-wizard.store';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/router';
 import { ControllerRenderProps, useFormContext } from 'react-hook-form';
 import * as z from 'zod';
 
@@ -65,6 +68,7 @@ type TypeLocationChange =
 type FieldValues = InferZodSchema<typeof formSchema>;
 
 export default function StepPreference() {
+    const router = useRouter();
     const stepperContext = useStepperContext();
 
     const setIsValidPreference = useClientRegistrationFormWizard(
@@ -82,7 +86,7 @@ export default function StepPreference() {
     function handleSubmit(data: FieldValues) {
         setSearchPreferenceForm(data);
 
-        stepperContext?.handleNextStep();
+        alert('Regsitration Complete');
     }
     return (
         <MotalentForm<FieldValues, object, FieldValues>
@@ -239,6 +243,44 @@ export default function StepPreference() {
                                             required
                                         />
                                     </MotalentFormItem>
+                                )}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="flex items-center justify-center gap-x-5">
+                        <div className="w-full">
+                            <FormField
+                                control={control}
+                                name="is_negotiable"
+                                render={({ field }) => (
+                                    <div className="flex gap-2 items-center">
+                                        <Checkbox
+                                            checked={field.value}
+                                            onCheckedChange={(value) => {
+                                                field.onChange(value);
+                                            }}
+                                        />
+                                        <Label>Negotiable ?</Label>
+                                    </div>
+                                )}
+                            />
+                        </div>
+
+                        <div className="w-full">
+                            <FormField
+                                control={control}
+                                name="is_dp"
+                                render={({ field }) => (
+                                    <div className="flex gap-2 items-center">
+                                        <Checkbox
+                                            checked={field.value}
+                                            onCheckedChange={(value) => {
+                                                field.onChange(value);
+                                            }}
+                                        />
+                                        <Label>Is DP ?</Label>
+                                    </div>
                                 )}
                             />
                         </div>
