@@ -21,23 +21,20 @@ export default function Home() {
             {
                 label: 'Profile',
                 isCustomStepActionButtons: true,
-                isEligibleNextStep: isValidProfile,
                 content: () => <StepProfile />
             },
             {
                 label: 'Location',
                 isCustomStepActionButtons: true,
-                isEligibleNextStep: isValidLocation,
                 content: () => <StepLocation />
             },
             {
                 label: 'Search Preferences',
                 isCustomStepActionButtons: true,
-                isEligibleNextStep: isValidPreference,
                 content: () => <StepPreference />
             }
         ],
-        [isValidLocation, isValidPreference, isValidProfile]
+        []
     );
     return (
         <div className="flex flex-col w-[800px] mx-auto my-8">

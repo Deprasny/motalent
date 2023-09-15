@@ -91,7 +91,7 @@ export const INITIAL_STATE: UseClientRegistrationFormWizardStore = {
         district_id: '',
         village_id: ''
     },
-    preferencesState: [INITIAL_PREF_STATE],
+    preferencesState: [],
     isValidProfile: false,
     setIsValidProfile: (value) => {},
 
@@ -183,13 +183,26 @@ export const useClientRegistrationFormWizard =
 
             collapsibleIndexs: [],
             toggleCollapsible: (index) => {
-                const oldCollapsibles = get().collapsibleIndexs;
-                const updatedCollapsibles = oldCollapsibles.includes(index)
-                    ? oldCollapsibles.filter((i) => i !== index)
-                    : [...oldCollapsibles, index];
+                set((prev) => {
+                    const updatedCollapsibles = [...prev.collapsibleIndexs];
+                    const isExist = updatedCollapsibles.includes(index);
 
-                set({
-                    collapsibleIndexs: updatedCollapsibles
+                    if (isExist) {
+                        const filteredCollapsibles = updatedCollapsibles.filter(
+                            (i) => i !== index
+                        );
+                        return {
+                            ...prev,
+                            collapsibleIndexs: filteredCollapsibles
+                        };
+                    }
+
+                    updatedCollapsibles.push(index);
+
+                    return {
+                        ...prev,
+                        collapsibleIndexs: updatedCollapsibles
+                    };
                 });
             }
         };

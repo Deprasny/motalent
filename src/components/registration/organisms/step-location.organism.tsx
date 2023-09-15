@@ -16,6 +16,7 @@ import {
     useQueryGetVillages
 } from '@/hooks/general';
 import { ControllerRenderProps, useFormContext } from 'react-hook-form';
+import { MapIcon, PinIcon } from 'lucide-react';
 
 type FieldValues = InferZodSchema<typeof formSchema>;
 
@@ -68,6 +69,20 @@ export default function StepLocation() {
         >
             {({ formState }) => (
                 <div className="flex flex-col gap-4">
+                    <div className="pt-4">
+                        <h1 className="inline-flex items-center gap-x-2 text-2xl font-semibold text-gray-800">
+                            <MapIcon className="w-6 h-6 text-gray-500" />
+                            <span className="text-gray-500">
+                                Location Details
+                            </span>{' '}
+                        </h1>
+                        <p className="text-gray-500">
+                            Please fill in the following information to complete
+                            your profile and continue to the next step. It will
+                            help us to find the best talent for you.
+                        </p>
+                    </div>
+
                     <LocationForms />
 
                     <div className="flex w-full justify-end self-end gap-3">
@@ -89,7 +104,7 @@ export default function StepLocation() {
 }
 
 function LocationForms() {
-    const { control, getValues, setValue } = useFormContext<FieldValues>();
+    const { control, watch, setValue } = useFormContext<FieldValues>();
 
     const setLocationForm = useClientRegistrationFormWizard(
         (state) => state.setLocationForm
@@ -99,13 +114,13 @@ function LocationForms() {
         useQueryGetProvinces();
 
     const { data: regencyOptions, isFetching: isLoadingRegencyOptions } =
-        useQueryGetRegencies(getValues('province_id'));
+        useQueryGetRegencies(watch('province_id'));
 
     const { data: districtOptions, isFetching: isLoadingDistrictOptions } =
-        useQueryGetDistricts(getValues('regency_id'));
+        useQueryGetDistricts(watch('regency_id'));
 
     const { data: villageOptions, isFetching: isLoadingVillageOptions } =
-        useQueryGetVillages(getValues('district_id'));
+        useQueryGetVillages(watch('district_id'));
 
     function handleLocationChange<T extends keyof FieldValues>(
         field: ControllerRenderProps<FieldValues, T>,
@@ -113,7 +128,7 @@ function LocationForms() {
     ) {
         return function (value: string) {
             setLocationForm({
-                ...getValues(),
+                ...watch(),
                 [type]: value
             });
 

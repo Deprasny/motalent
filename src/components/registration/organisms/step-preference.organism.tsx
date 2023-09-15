@@ -19,12 +19,20 @@ import {
     useQueryGetVillages
 } from '@/hooks/general';
 import { InferZodSchema } from '@/interfaces/zod.interface';
+import { toInt } from '@/lib/utils';
 import {
     INITIAL_PREF_STATE,
     useClientRegistrationFormWizard
 } from '@/stores/client-registration-form-wizard.store';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ChevronsDownUp, ChevronsUpDown, PlusIcon, Trash2 } from 'lucide-react';
+import {
+    ChevronsDownUp,
+    ChevronsUpDown,
+    PlusIcon,
+    Search,
+    SearchIcon,
+    Trash2
+} from 'lucide-react';
 import { HTMLAttributes, useState } from 'react';
 import {
     ControllerRenderProps,
@@ -50,21 +58,39 @@ import * as z from 'zod';
 //   "is_dp": true
 
 const preferenceSchema = z.object({
-    category_ids: z.string().nonempty(),
-    province_id: z.string().nonempty(),
-    regency_id: z.string().nonempty(),
-    village_id: z.string().nonempty(),
-    district_id: z.string().nonempty(),
-    min_price: z.number(),
-    max_price: z.number(),
-    min_age: z.number(),
-    max_age: z.number(),
+    category_ids: z.string().nonempty({
+        message: 'Category is required'
+    }),
+    province_id: z.string().nonempty({
+        message: 'Province is required'
+    }),
+    regency_id: z.string().nonempty({
+        message: 'Regency is required'
+    }),
+    village_id: z.string().nonempty({
+        message: 'Village is required'
+    }),
+    district_id: z.string().nonempty({
+        message: 'District is required'
+    }),
+    min_price: z.number().nonnegative().min(1, {
+        message: 'Min price must be greater than 0'
+    }),
+    max_price: z.number().nonnegative().min(1, {
+        message: 'Max price must be greater than 0'
+    }),
+    min_age: z.number().nonnegative().min(1, {
+        message: 'Min age must be greater than 0'
+    }),
+    max_age: z.number().nonnegative().min(1, {
+        message: 'Max age must be greater than 0'
+    }),
     is_negotiable: z.boolean(),
     is_dp: z.boolean()
 });
 
 const formSchema = z.object({
-    preferences: z.array(preferenceSchema).min(1).nonempty()
+    preferences: z.array(preferenceSchema)
 });
 
 const EXAMPLE = [
@@ -134,6 +160,8 @@ export default function StepPreference() {
                 setIsValidPreference(false);
             }}
             onValid={() => setIsValidPreference(true)}
+            reValidateMode="onChange"
+            mode="onChange"
         >
             {({ control, formState }) => (
                 <PreferenceArrayForms>
@@ -151,16 +179,23 @@ export default function StepPreference() {
                         return (
                             <div className="flex flex-col gap-4">
                                 <div className="pt-4">
-                                    <p className="text-center text-gray-500">
-                                        Fullfill your preference or criteria
-                                        that you want to be matched!
+                                    <h1 className="inline-flex items-center gap-x-2 text-2xl font-semibold text-gray-800">
+                                        <SearchIcon className="w-6 h-6 text-gray-500" />
+                                        <span className="text-gray-500">
+                                            Search Preferences
+                                        </span>{' '}
+                                    </h1>
+                                    <p className="text-gray-500">
+                                        Please choose your search preferences to
+                                        help us find the best talent for you!
+                                        Dont worry, you can add more later.
                                     </p>
                                 </div>
 
                                 <div className="flex flex-col gap-8">
                                     {fields.map(({ id }, index) => (
                                         <PreferenceCollapsible
-                                            key={index}
+                                            key={`${index}-${id}`}
                                             currentIndex={index}
                                             onRemovePreference={
                                                 onRemovePreference
@@ -168,6 +203,7 @@ export default function StepPreference() {
                                             fieldsLength={fields.length}
                                         >
                                             <LocationForms
+                                                key={`${index}-${id}`}
                                                 currentIndex={index}
                                             />
 
@@ -215,10 +251,18 @@ export default function StepPreference() {
                                                                 'min_price'
                                                             ) as 'preferences.0.min_price'
                                                         }
-                                                        render={({ field }) => (
+                                                        render={({
+                                                            field,
+                                                            fieldState
+                                                        }) => (
                                                             <MotalentFormItem
                                                                 label="Min price"
                                                                 description="Please input min price"
+                                                                message={
+                                                                    fieldState
+                                                                        .error
+                                                                        ?.message
+                                                                }
                                                             >
                                                                 <MotalentInput
                                                                     {...field}
@@ -227,22 +271,20 @@ export default function StepPreference() {
                                                                     }
                                                                     placeholder="Input"
                                                                     type="number"
-                                                                    onChange={(
-                                                                        val
-                                                                    ) => {
+                                                                    onChange={({
+                                                                        target
+                                                                    }) => {
                                                                         field.onChange(
-                                                                            parseInt(
-                                                                                val
-                                                                                    .target
-                                                                                    .value ||
-                                                                                    String(
-                                                                                        0
-                                                                                    )
+                                                                            toInt(
+                                                                                target.value
                                                                             )
                                                                         );
                                                                     }}
-                                                                    min={1}
-                                                                    required
+                                                                    isError={
+                                                                        !!fieldState
+                                                                            .error
+                                                                            ?.message
+                                                                    }
                                                                 />
                                                             </MotalentFormItem>
                                                         )}
@@ -270,22 +312,15 @@ export default function StepPreference() {
                                                                     }
                                                                     placeholder="Input"
                                                                     type="number"
-                                                                    onChange={(
-                                                                        val
-                                                                    ) => {
+                                                                    onChange={({
+                                                                        target
+                                                                    }) => {
                                                                         field.onChange(
-                                                                            parseInt(
-                                                                                val
-                                                                                    .target
-                                                                                    .value ||
-                                                                                    String(
-                                                                                        0
-                                                                                    )
+                                                                            toInt(
+                                                                                target.value
                                                                             )
                                                                         );
                                                                     }}
-                                                                    min={1}
-                                                                    required
                                                                 />
                                                             </MotalentFormItem>
                                                         )}
@@ -315,22 +350,15 @@ export default function StepPreference() {
                                                                     }
                                                                     placeholder="Input"
                                                                     type="number"
-                                                                    onChange={(
-                                                                        val
-                                                                    ) => {
+                                                                    onChange={({
+                                                                        target
+                                                                    }) => {
                                                                         field.onChange(
-                                                                            parseInt(
-                                                                                val
-                                                                                    .target
-                                                                                    .value ||
-                                                                                    String(
-                                                                                        0
-                                                                                    )
+                                                                            toInt(
+                                                                                target.value
                                                                             )
                                                                         );
                                                                     }}
-                                                                    min={1}
-                                                                    required
                                                                 />
                                                             </MotalentFormItem>
                                                         )}
@@ -358,22 +386,15 @@ export default function StepPreference() {
                                                                     }
                                                                     placeholder="Input"
                                                                     type="number"
-                                                                    onChange={(
-                                                                        val
-                                                                    ) => {
+                                                                    onChange={({
+                                                                        target
+                                                                    }) => {
                                                                         field.onChange(
-                                                                            parseInt(
-                                                                                val
-                                                                                    .target
-                                                                                    .value ||
-                                                                                    String(
-                                                                                        0
-                                                                                    )
+                                                                            toInt(
+                                                                                target.value
                                                                             )
                                                                         );
                                                                     }}
-                                                                    min={1}
-                                                                    required
                                                                 />
                                                             </MotalentFormItem>
                                                         )}
@@ -454,7 +475,10 @@ export default function StepPreference() {
                                         variant="outline"
                                         onClick={onAddMore}
                                     >
-                                        <PlusIcon className="mr-1" /> Add more
+                                        <PlusIcon className="mr-1" />{' '}
+                                        {fields.length === 0
+                                            ? 'Add My Preference'
+                                            : 'Add More'}
                                     </Button>
                                 </div>
 
@@ -517,19 +541,15 @@ function PreferenceCollapsible({
     onRemovePreference,
     ...rest
 }: PreferenceCollapsibleProps) {
-    const randomKeyId = Math.random().toString(36).substr(2, 9);
-    const [_isOpen, setIsOpen] = useState(false);
-
     const { collapsibleIndexs, toggleCollapsible } =
         useClientRegistrationFormWizard((state) => ({
             collapsibleIndexs: state.collapsibleIndexs,
             toggleCollapsible: state.toggleCollapsible
         }));
 
-    const collapsibleCompId = `preference-${randomKeyId}`;
-
-    const isDisableRemovePreference = fieldsLength === 1;
     const isCollapsibleOpen = collapsibleIndexs.includes(currentIndex);
+
+    const [_isOpen, setIsOpen] = useState(isCollapsibleOpen || isOpen);
 
     function onOpenChange(open: boolean) {
         setIsOpen(open);
@@ -539,13 +559,11 @@ function PreferenceCollapsible({
 
     return (
         <Collapsible
-            {...rest}
-            id={collapsibleCompId}
-            open={_isOpen || isCollapsibleOpen}
+            open={_isOpen}
             disabled={isDisabled}
             onOpenChange={onOpenChange}
-            key={randomKeyId}
-            className="flex flex-col gap-4 border border-gray-200 rounded-md px-8 py-4"
+            className="flex flex-col border border-gray-200 rounded-md px-8 py-4"
+            {...rest}
         >
             <div className="flex items-center justify-between space-x-4">
                 <h1 className="text-2xl font-bold">
@@ -557,7 +575,6 @@ function PreferenceCollapsible({
                         type="button"
                         variant="ghost"
                         size="icon"
-                        disabled={isDisableRemovePreference}
                         className="text-red-400"
                         onClick={() =>
                             onRemovePreference &&
@@ -578,7 +595,9 @@ function PreferenceCollapsible({
                 </div>
             </div>
 
-            <CollapsibleContent>{children}</CollapsibleContent>
+            <CollapsibleContent className="flex flex-col gap-4">
+                {children}
+            </CollapsibleContent>
         </Collapsible>
     );
 }
@@ -606,24 +625,24 @@ function LocationForms({ currentIndex = 0 }: { currentIndex?: number }) {
     const regencyValue = getPreferenceByIndexValues().regency_id;
     const districtValue = getPreferenceByIndexValues().district_id;
 
-    const { data: provinceOptions, isFetching: isLoadingProvinceOptions } =
+    const { data: provinceOptions, isLoading: isLoadingProvinceOptions } =
         useQueryGetProvinces(['provinces', currentIndex]);
 
-    const { data: regencyOptions, isFetching: isLoadingRegencyOptions } =
+    const { data: regencyOptions, isLoading: isLoadingRegencyOptions } =
         useQueryGetRegencies(provinceValue, [
             'regencies',
             provinceValue,
             currentIndex
         ]);
 
-    const { data: districtOptions, isFetching: isLoadingDistrictOptions } =
+    const { data: districtOptions, isLoading: isLoadingDistrictOptions } =
         useQueryGetDistricts(regencyValue, [
             'districts',
             regencyValue,
             currentIndex
         ]);
 
-    const { data: villageOptions, isFetching: isLoadingVillageOptions } =
+    const { data: villageOptions, isLoading: isLoadingVillageOptions } =
         useQueryGetVillages(districtValue, [
             'villages',
             districtValue,
@@ -666,8 +685,8 @@ function LocationForms({ currentIndex = 0 }: { currentIndex?: number }) {
     }
 
     return (
-        <>
-            <div className="flex items-center justify-center gap-x-5">
+        <div className="flex flex-col gap-8">
+            <div className="flex items-center justify-center gap-x-5 gap-y-10">
                 <div className="w-full">
                     <FormField
                         control={control}
@@ -790,6 +809,6 @@ function LocationForms({ currentIndex = 0 }: { currentIndex?: number }) {
                     />
                 </div>
             </div>
-        </>
+        </div>
     );
 }

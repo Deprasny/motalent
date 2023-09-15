@@ -32,6 +32,10 @@ export interface StepperStep {
     label: React.ReactNode | string | ((isActive: boolean) => React.ReactNode);
     content: StepperRenderContentFn;
     isCustomStepActionButtons?: boolean;
+
+    /**
+     * @deprecated we don't need this anymore
+     */
     isEligibleNextStep?: boolean;
 }
 
