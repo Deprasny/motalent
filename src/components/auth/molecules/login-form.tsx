@@ -9,6 +9,9 @@ import { FormField } from '@/components/ui/form';
 import { InferZodSchema } from '@/interfaces/zod.interface';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
+import { signIn } from 'next-auth/react';
+import { useRouter } from 'next/router';
+import { useToast } from '@/components/ui/use-toast';
 
 const formSchema = z.object({
     email: z
@@ -26,12 +29,28 @@ const formSchema = z.object({
 type LoginFieldValues = InferZodSchema<typeof formSchema>;
 
 export default function LoginForm() {
+    const router = useRouter();
+    const { toast } = useToast();
+
     async function handleSubmit(data: LoginFieldValues) {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve(data);
-            }, 4000);
+        const res = await signIn('credentials', {
+            email: data.email,
+            password: data.password,
+            redirect: false
         });
+
+        const callbackUrl = router.query.callbackUrl as string;
+
+        if (res?.ok) {
+            router.replace(callbackUrl || '/protected');
+        } else {
+            toast({
+                title: 'Ooops! Something went wrong.',
+                description: res?.error as string,
+                variant: 'destructive',
+                duration: 5000
+            });
+        }
     }
 
     return (
