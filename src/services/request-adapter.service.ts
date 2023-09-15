@@ -1,6 +1,7 @@
 import { ENV_CONFIG } from '@/lib/env-config';
 import axios, {
     AxiosInstance,
+    AxiosRequestConfig,
     AxiosResponse,
     CreateAxiosDefaults,
     InternalAxiosRequestConfig
@@ -41,8 +42,8 @@ export class RequestAdapter {
 
     public sendGetRequest<T>(
         url: string,
-        params?: InternalAxiosRequestConfig['params'],
-        config?: InternalAxiosRequestConfig
+        params?: AxiosRequestConfig['params'],
+        config?: AxiosRequestConfig
     ): Promise<AxiosResponse<T>> {
         return this.adapter.get<T, AxiosResponse<T>>(url, {
             ...config,
@@ -54,8 +55,8 @@ export class RequestAdapter {
         url: string,
         data?: B,
         config?: InternalAxiosRequestConfig
-    ): Promise<AxiosResponse<B>> {
-        return this.adapter.post<T, AxiosResponse<B>>(url, data, config);
+    ): Promise<AxiosResponse<T>> {
+        return this.adapter.post<B, AxiosResponse<T>>(url, data, config);
     }
 
     public sendPutRequest<B, T>(

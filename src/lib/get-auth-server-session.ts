@@ -1,0 +1,10 @@
+import { GetServerSidePropsContext } from 'next';
+import { getServerSession } from 'next-auth';
+
+import { authOptions } from '@/pages/api/auth/[...nextauth]';
+
+export const getAuthServerSession = async (
+    context: GetServerSidePropsContext
+) => {
+    return await getServerSession(context.req, context.res, authOptions);
+};
