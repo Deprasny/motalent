@@ -21,7 +21,7 @@ export default function MotalentFormItem({
 }: MotalentFormItemProps) {
     return (
         <FormItem>
-            <FormLabel>{label}</FormLabel>
+            <FormLabel className="">{label}</FormLabel>
             <FormControl>{children}</FormControl>
             <FormDescription>{description}</FormDescription>
             <FormMessage>{message}</FormMessage>

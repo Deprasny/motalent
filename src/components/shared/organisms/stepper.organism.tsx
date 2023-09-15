@@ -135,7 +135,7 @@ export default function Stepper({
 
     return (
         <StepperProvider value={value}>
-            <div className="mx-4 py-10">
+            <div className="mx-4 py-14">
                 <div className="flex items-center">
                     {steps.map((stepItem, index) => {
                         const isActive = currentStepIndex === index;
@@ -173,9 +173,9 @@ export default function Stepper({
                                         className={clsx([
                                             'rounded-full transition duration-500 ease-in-out h-12 w-12 py-3 border-2 flex justify-center items-center',
                                             {
-                                                'bg-blue-600':
+                                                'bg-slate-800':
                                                     isActive || isCompletedStep,
-                                                'border-blue-600':
+                                                'border-slate-600':
                                                     isActive || isCompletedStep,
                                                 'text-gray-400': !isActive,
                                                 'text-white': isCompletedStep,
@@ -195,7 +195,7 @@ export default function Stepper({
                                                 'text-gray-400':
                                                     !isActive &&
                                                     !isCompletedStep,
-                                                'text-blue-600':
+                                                'text-slate-800':
                                                     isActive || isCompletedStep
                                             }
                                         ])}
@@ -206,7 +206,7 @@ export default function Stepper({
                                         className={clsx([
                                             'flex-auto border-t-2 transition duration-500 ease-in-out',
                                             {
-                                                'border-blue-600':
+                                                'border-slate-800':
                                                     isCompletedStep,
                                                 'border-gray-300':
                                                     !isCompletedStep
@@ -219,7 +219,7 @@ export default function Stepper({
                                         className={clsx([
                                             'flex-auto border-t-2 transition duration-500 ease-in-out',
                                             {
-                                                'border-blue-600':
+                                                'border-slate-800':
                                                     isCompletedStep,
                                                 'border-gray-300':
                                                     !isCompletedStep
