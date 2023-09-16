@@ -1,10 +1,12 @@
 import {
+    Category,
     District,
     Province,
     Regency,
     Village
 } from '@/interfaces/general-service.interface';
 import { RequestAdapter } from './request-adapter.service';
+import { BaseResponse } from '@/interfaces/global.interface';
 
 export class GeneralService extends RequestAdapter {
     constructor() {
@@ -61,6 +63,19 @@ export class GeneralService extends RequestAdapter {
                     district_id: String(districtId)
                 }
             );
+
+            return data;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    public async getCategories() {
+        try {
+            const { data } =
+                await this.sendGetRequest<BaseResponse<Category[]>>(
+                    `/general/categories`
+                );
 
             return data;
         } catch (error) {
