@@ -14,3 +14,11 @@ export interface District extends Omit<Regency, 'province_id'> {
 export interface Village extends Omit<District, 'regency_id'> {
     district_id: number;
 }
+
+export interface Category {
+    id: string;
+    name: string;
+    description: string;
+    createdAt: string;
+    updatedAt: string;
+}

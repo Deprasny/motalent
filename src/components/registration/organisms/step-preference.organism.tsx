@@ -15,6 +15,7 @@ import { FormField } from '@/components/ui/form';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import {
+    useGetCategories,
     useQueryGetDistricts,
     useQueryGetProvinces,
     useQueryGetRegencies,
@@ -95,17 +96,6 @@ const formSchema = z.object({
     preferences: z.array(preferenceSchema)
 });
 
-const EXAMPLE = [
-    {
-        label: 'A',
-        value: 'A'
-    },
-    {
-        label: 'B',
-        value: 'B'
-    }
-];
-
 type TypeLocationChange =
     | 'province_id'
     | 'regency_id'
@@ -139,6 +129,9 @@ export default function StepPreference() {
     const defaultPreferenceForm = useClientRegistrationFormWizard(
         (state) => state.preferencesState
     );
+
+    const { data: categoryOptions, isLoading: isLoadingGetCategoryOptions } =
+        useGetCategories();
 
     function handleSubmit(data: FormFieldSchema) {
         setIsValidPreference(true);
@@ -214,18 +207,24 @@ export default function StepPreference() {
                                                                 description="Please choose your category"
                                                             >
                                                                 <MotalentSelect
-                                                                    defaultValue={field.value.toString()}
-                                                                    value={
-                                                                        field.value as string
-                                                                    }
-                                                                    onValueChange={
-                                                                        field.onChange
-                                                                    }
+                                                                    {...field}
+                                                                    value={field.value.toString()}
+                                                                    onValueChange={(
+                                                                        value
+                                                                    ) => {
+                                                                        field.onChange(
+                                                                            value
+                                                                        );
+                                                                    }}
                                                                     ref={
                                                                         field.ref
                                                                     }
                                                                     options={
-                                                                        EXAMPLE
+                                                                        categoryOptions ||
+                                                                        []
+                                                                    }
+                                                                    isLoading={
+                                                                        isLoadingGetCategoryOptions
                                                                     }
                                                                 />
                                                             </MotalentFormItem>
