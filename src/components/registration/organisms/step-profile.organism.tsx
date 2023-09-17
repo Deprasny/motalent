@@ -1,5 +1,6 @@
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useSession } from 'next-auth/react';
 
 import MotalentForm from '@/components/shared/molecules/motalent-form';
 import MotalentFormItem from '@/components/shared/molecules/motalent-form-item';
@@ -49,6 +50,8 @@ const BLOOD_TYPES: SelectOptions = [
 ];
 
 const StepProfile = () => {
+    const { data: session } = useSession();
+
     const stepperContext = useStepperContext();
 
     const setIsValidProfile = useClientRegistrationFormWizard(
@@ -78,9 +81,14 @@ const StepProfile = () => {
                 handleSubmit(data);
             }}
             resolver={zodResolver(formSchema)}
-            defaultValues={{
+            values={{
                 ...defaultProfileForm,
-                dob: defaultProfileForm.dob?.toISOString().split('T')[0]
+                address: defaultProfileForm.address || '',
+                age: defaultProfileForm.age?.toString() || '',
+                blood_type: defaultProfileForm.blood_type || '',
+                gender: defaultProfileForm.gender || 'male',
+                name: defaultProfileForm.name || session?.user?.name || '',
+                dob: defaultProfileForm.dob?.toISOString().split('T')[0] || ''
             }}
             mode="onChange"
             reValidateMode="onChange"
