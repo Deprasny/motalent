@@ -1,3 +1,4 @@
+import Navbar from '@/components/layouts/navbar.layout';
 import StepLocation from '@/components/registration/organisms/step-location.organism';
 import StepPreference from '@/components/registration/organisms/step-preference.organism';
 import StepProfile from '@/components/registration/organisms/step-profile.organism';
@@ -37,8 +38,10 @@ export default function Home() {
         []
     );
     return (
-        <div className="flex flex-col w-[1180px] mx-auto">
-            <Stepper defaultStep={0} steps={steps} />
-        </div>
+        <Navbar>
+            <div className="flex flex-col w-[1180px] mx-auto">
+                <Stepper defaultStep={0} steps={steps} />
+            </div>
+        </Navbar>
     );
 }
