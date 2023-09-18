@@ -17,6 +17,7 @@ declare module 'next-auth' {
         role: string;
         status: 'active' | 'inactive';
         is_active: boolean;
+        has_complete_registration: boolean;
         accessToken: string;
         client: {
             id: number;

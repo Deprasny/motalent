@@ -1,4 +1,4 @@
-import { UserNav } from './user-nav';
+import { UserNav } from '../shared/organisms/motalent-user-nav.organism';
 import { useSession } from 'next-auth/react';
 
 interface INavbarProps {

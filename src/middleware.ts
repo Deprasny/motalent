@@ -6,4 +6,4 @@ export default withAuth(function middleware(req) {}, {
     }
 });
 
-export const config = { matcher: ['/', '/protected'] };
+export const config = { matcher: ['/'] };

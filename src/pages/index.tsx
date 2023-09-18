@@ -5,8 +5,10 @@ import StepProfile from '@/components/registration/organisms/step-profile.organi
 
 import Stepper, {
     StepperStep
-} from '@/components/shared/organisms/stepper.organism';
+} from '@/components/shared/organisms/motalent-stepper.organism';
+import { getAuthServerSession } from '@/lib/get-auth-server-session';
 import { useClientRegistrationFormWizard } from '@/stores/client-registration-form-wizard.store';
+import { GetServerSideProps } from 'next';
 import { useMemo } from 'react';
 
 export default function Home() {
@@ -45,3 +47,20 @@ export default function Home() {
         </Navbar>
     );
 }
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+    const session = await getAuthServerSession(context);
+
+    if (session && session.user.has_complete_registration) {
+        return {
+            redirect: {
+                destination: '/protected',
+                permanent: false
+            }
+        };
+    }
+
+    return {
+        props: {}
+    };
+};

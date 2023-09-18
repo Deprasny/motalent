@@ -15,7 +15,7 @@ import {
     ClientProfileFormState,
     useClientRegistrationFormWizard
 } from '@/stores/client-registration-form-wizard.store';
-import { useStepperContext } from '@/components/shared/organisms/stepper.organism';
+import { useStepperContext } from '@/components/shared/organisms/motalent-stepper.organism';
 import { Button } from '@/components/ui/button';
 import MotalentCard from '@/components/shared/molecules/motalent-card';
 
@@ -33,19 +33,19 @@ type FieldValues = InferZodSchema<typeof formSchema>;
 const BLOOD_TYPES: SelectOptions = [
     {
         label: 'A',
-        value: 'a'
+        value: 'A'
     },
     {
         label: 'B',
-        value: 'b'
+        value: 'B'
     },
     {
         label: 'AB',
-        value: 'ab'
+        value: 'AB'
     },
     {
         label: 'O',
-        value: 'o'
+        value: 'O'
     }
 ];
 

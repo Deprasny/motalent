@@ -57,7 +57,12 @@ export const authOptions: AuthOptions = {
     },
     callbacks: {
         // Assigning encoded token from API to token created in the session
-        async jwt({ user: response, token, account }) {
+        async jwt({ user: response, token, account, session, trigger }) {
+            if (trigger === 'update' && session) {
+                token.accessToken = session.accessToken;
+                token.user = session.user;
+            }
+
             if (account && response) {
                 token.accessToken = response.accessToken;
                 token.user = response;

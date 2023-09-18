@@ -59,6 +59,8 @@ interface UseClientRegistrationFormWizardStore {
     setIsValidPreference: (bool: boolean) => void;
     setPushPreferencesForm: (state: ClientSeachPreferenceFormState) => void;
     setRemovePreferencesForm: (index: number) => void;
+    setPreferencesForm: (state: ClientSeachPreferenceFormState[]) => void;
+
     toggleCollapsible: (index: number) => void;
 }
 
@@ -106,6 +108,8 @@ export const INITIAL_STATE: UseClientRegistrationFormWizardStore = {
     setSearchPreferencesForm: (index, payload) => {},
     setPushPreferencesForm: (state) => {},
     setRemovePreferencesForm: (index) => {},
+
+    setPreferencesForm: (state) => {},
 
     collapsibleIndexs: [],
     toggleCollapsible: (index) => {}
@@ -179,6 +183,13 @@ export const useClientRegistrationFormWizard =
                 set({
                     preferencesState: updatedPreferences
                 });
+            },
+
+            setPreferencesForm: (state) => {
+                set((prev) => ({
+                    ...prev,
+                    preferencesState: state
+                }));
             },
 
             collapsibleIndexs: [],
