@@ -3,7 +3,7 @@ import MotalentForm from '@/components/shared/molecules/motalent-form';
 import MotalentFormItem from '@/components/shared/molecules/motalent-form-item';
 import MotalentInput from '@/components/shared/molecules/motalent-input';
 import MotalentSelect from '@/components/shared/molecules/motalent-select';
-import { useStepperContext } from '@/components/shared/organisms/stepper.organism';
+import { useStepperContext } from '@/components/shared/organisms/motalent-stepper.organism';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -14,6 +14,7 @@ import {
 import { FormField } from '@/components/ui/form';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { useUpdateRegistration } from '@/hooks/client/useUpdateRegistration';
 import {
     useGetCategories,
     useQueryGetDistricts,
@@ -36,6 +37,7 @@ import {
     SearchIcon,
     Trash2
 } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import { HTMLAttributes, useState } from 'react';
 import {
     ControllerRenderProps,
@@ -114,6 +116,9 @@ function getPreferenceKeyName(
 
 export default function StepPreference() {
     const stepperContext = useStepperContext();
+    const { data: session } = useSession(); // import
+
+    const { mutateAsync, isLoading } = useUpdateRegistration();
 
     const setIsValidPreference = useClientRegistrationFormWizard(
         (state) => state.setIsValidPreference
@@ -130,16 +135,49 @@ export default function StepPreference() {
         (state) => state.preferencesState
     );
 
+    const setPreferencesForm = useClientRegistrationFormWizard(
+        (state) => state.setPreferencesForm
+    );
+
+    const formState = useClientRegistrationFormWizard((state) => state);
+
     const { data: categoryOptions, isLoading: isLoadingGetCategoryOptions } =
         useGetCategories();
 
-    function handleSubmit(data: FormFieldSchema) {
+    async function handleSubmit(data: FormFieldSchema) {
         setIsValidPreference(true);
-        alert('Regsitration Complete');
 
-        console.log({
-            data,
-            defaultPreferenceForm
+        await mutateAsync({
+            client_id: session?.user?.client?.id || 0,
+            location: formState.locationState,
+            profile: {
+                ...formState.profileState,
+                name: formState.profileState.name || session?.user?.name || '',
+                address: formState.profileState.address || '',
+                age: parseInt(formState.profileState.age || '0') || 0,
+                blood_type: formState.profileState.blood_type || '',
+                dob:
+                    formState.profileState.dob?.toISOString() ||
+                    new Date().toISOString(),
+                gender:
+                    formState.profileState?.gender === 'male'
+                        ? 'male'
+                        : 'female'
+            },
+            search_preferences: data.preferences.map((pref) => ({
+                category_ids:
+                    pref.category_ids?.split(',').map((id) => id) || [],
+                province_id: pref.province_id,
+                regency_id: pref.regency_id,
+                district_id: pref.district_id,
+                village_id: pref.village_id,
+                min_price: parseInt(pref.min_price.toString()),
+                max_price: parseInt(pref.max_price.toString()),
+                min_age: parseInt(pref.min_age.toString()),
+                max_age: parseInt(pref.max_age.toString()),
+                is_negotiable: pref.is_negotiable,
+                is_dp: pref.is_dp
+            }))
         });
     }
     return (
@@ -158,7 +196,7 @@ export default function StepPreference() {
             reValidateMode="onChange"
             mode="onChange"
         >
-            {({ control, formState }) => (
+            {({ control, getValues, formState }) => (
                 <PreferenceArrayForms>
                     {({ fields, append, remove }) => {
                         function onAddMore() {
@@ -478,16 +516,26 @@ export default function StepPreference() {
                                     <Button
                                         type="button"
                                         disabled={stepperContext?.isFirstStep}
-                                        onClick={stepperContext?.handlePrevStep}
+                                        onClick={() => {
+                                            stepperContext?.handlePrevStep();
+
+                                            setPreferencesForm(
+                                                getValues().preferences
+                                            );
+                                        }}
                                     >
                                         Prev
                                     </Button>
 
                                     <Button
-                                        disabled={!formState.isValid}
+                                        disabled={
+                                            !formState.isValid || isLoading
+                                        }
+                                        isLoading={isLoading}
+                                        loadingText="Submitting..."
                                         type="submit"
                                     >
-                                        Next
+                                        Submit
                                     </Button>
                                 </div>
                             </MotalentCard>

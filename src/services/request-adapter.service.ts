@@ -6,6 +6,7 @@ import axios, {
     CreateAxiosDefaults,
     InternalAxiosRequestConfig
 } from 'axios';
+import { getSession } from 'next-auth/react';
 
 interface RequestAdapterProps extends CreateAxiosDefaults {}
 
@@ -24,10 +25,19 @@ export class RequestAdapter {
         this.adapter.interceptors.response.use(this.interceptResponse);
     }
 
-    private interceptRequest(
+    private async interceptRequest(
         config: InternalAxiosRequestConfig
-    ): InternalAxiosRequestConfig | Promise<InternalAxiosRequestConfig> {
+    ): Promise<InternalAxiosRequestConfig> {
         {
+            const session = await getSession();
+
+            if (session) {
+                console.log('TOKENNNNN', {
+                    session
+                });
+                config.headers.Authorization = `Bearer ${session.accessToken}`;
+            }
+
             return config;
         }
     }
@@ -63,8 +73,8 @@ export class RequestAdapter {
         url: string,
         data?: B,
         config?: InternalAxiosRequestConfig
-    ): Promise<AxiosResponse<B>> {
-        return this.adapter.put<T, AxiosResponse<B>>(url, data, config);
+    ): Promise<AxiosResponse<T>> {
+        return this.adapter.put<B, AxiosResponse<T>>(url, data, config);
     }
 
     public sendPatchRequest<B, T>(

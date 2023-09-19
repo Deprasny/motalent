@@ -1,7 +1,12 @@
 import { BaseResponse } from '@/interfaces/global.interface';
 import { RequestAdapter } from './request-adapter.service';
-import { SignInResponse } from '@/interfaces/auth.interface';
+import {
+    SignInResponse,
+    SignUpResponse,
+    SignUpRequestBody
+} from '@/interfaces/auth.interface';
 import { User } from 'next-auth';
+import { parseArrayErrorMessage } from '@/lib/error-parser';
 
 export class AuthService extends RequestAdapter {
     constructor() {
@@ -23,6 +28,35 @@ export class AuthService extends RequestAdapter {
 
             return data?.data?.access_token;
         } catch (error) {
+            throw error;
+        }
+    }
+
+    public async register({
+        name,
+        email,
+        password,
+        password_confirmation
+    }: SignUpRequestBody) {
+        try {
+            const { data } = await this.sendPostRequest<
+                SignUpRequestBody,
+                BaseResponse<SignUpResponse>
+            >('/auth/sign-up', {
+                name,
+                email,
+                password,
+                password_confirmation
+            });
+
+            return data?.data.access_token;
+        } catch (error: any) {
+            if (error.response.data) {
+                throw parseArrayErrorMessage(
+                    error.response.data.errors.message
+                );
+            }
+
             throw error;
         }
     }

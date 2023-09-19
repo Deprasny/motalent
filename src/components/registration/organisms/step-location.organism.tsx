@@ -1,6 +1,6 @@
 import * as z from 'zod';
 
-import { useStepperContext } from '@/components/shared/organisms/stepper.organism';
+import { useStepperContext } from '@/components/shared/organisms/motalent-stepper.organism';
 import { Button } from '@/components/ui/button';
 import { zodResolver } from '@hookform/resolvers/zod';
 import MotalentForm from '@/components/shared/molecules/motalent-form';

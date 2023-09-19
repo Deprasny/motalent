@@ -1,5 +1,6 @@
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useSession } from 'next-auth/react';
 
 import MotalentForm from '@/components/shared/molecules/motalent-form';
 import MotalentFormItem from '@/components/shared/molecules/motalent-form-item';
@@ -14,7 +15,7 @@ import {
     ClientProfileFormState,
     useClientRegistrationFormWizard
 } from '@/stores/client-registration-form-wizard.store';
-import { useStepperContext } from '@/components/shared/organisms/stepper.organism';
+import { useStepperContext } from '@/components/shared/organisms/motalent-stepper.organism';
 import { Button } from '@/components/ui/button';
 import MotalentCard from '@/components/shared/molecules/motalent-card';
 
@@ -32,23 +33,25 @@ type FieldValues = InferZodSchema<typeof formSchema>;
 const BLOOD_TYPES: SelectOptions = [
     {
         label: 'A',
-        value: 'a'
+        value: 'A'
     },
     {
         label: 'B',
-        value: 'b'
+        value: 'B'
     },
     {
         label: 'AB',
-        value: 'ab'
+        value: 'AB'
     },
     {
         label: 'O',
-        value: 'o'
+        value: 'O'
     }
 ];
 
 const StepProfile = () => {
+    const { data: session } = useSession();
+
     const stepperContext = useStepperContext();
 
     const setIsValidProfile = useClientRegistrationFormWizard(
@@ -78,9 +81,14 @@ const StepProfile = () => {
                 handleSubmit(data);
             }}
             resolver={zodResolver(formSchema)}
-            defaultValues={{
+            values={{
                 ...defaultProfileForm,
-                dob: defaultProfileForm.dob?.toISOString().split('T')[0]
+                address: defaultProfileForm.address || '',
+                age: defaultProfileForm.age?.toString() || '',
+                blood_type: defaultProfileForm.blood_type || '',
+                gender: defaultProfileForm.gender || 'male',
+                name: defaultProfileForm.name || session?.user?.name || '',
+                dob: defaultProfileForm.dob?.toISOString().split('T')[0] || ''
             }}
             mode="onChange"
             reValidateMode="onChange"

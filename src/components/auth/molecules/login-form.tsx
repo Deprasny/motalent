@@ -42,7 +42,7 @@ export default function LoginForm() {
         const callbackUrl = router.query.callbackUrl as string;
 
         if (res?.ok) {
-            router.replace(callbackUrl || '/protected');
+            router.replace(callbackUrl || '/');
         } else {
             toast({
                 title: 'Ooops! Something went wrong.',
