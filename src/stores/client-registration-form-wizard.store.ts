@@ -21,7 +21,7 @@ interface ClientLocationFormState {
 interface ClientLocationFormStore extends ClientLocationFormState {}
 
 interface ClientSeachPreferenceFormState {
-    category_ids: string;
+    category_ids: string[];
     province_id: string;
     regency_id: string;
     district_id: string;
@@ -65,7 +65,7 @@ interface UseClientRegistrationFormWizardStore {
 }
 
 export const INITIAL_PREF_STATE: ClientSeachPreferenceFormState = {
-    category_ids: '',
+    category_ids: [],
     regency_id: '',
     district_id: '',
     village_id: '',

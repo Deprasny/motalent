@@ -1,4 +1,8 @@
 import MotalentCard from '@/components/shared/molecules/motalent-card';
+import MotalentCoolSelect, {
+    getMultiValues,
+    onMultiChange
+} from '@/components/shared/molecules/motalent-cool-select';
 import MotalentForm from '@/components/shared/molecules/motalent-form';
 import MotalentFormItem from '@/components/shared/molecules/motalent-form-item';
 import MotalentInput from '@/components/shared/molecules/motalent-input';
@@ -22,6 +26,7 @@ import {
     useQueryGetRegencies,
     useQueryGetVillages
 } from '@/hooks/general';
+import { SelectOption } from '@/interfaces/global.interface';
 import { InferZodSchema } from '@/interfaces/zod.interface';
 import { toInt } from '@/lib/utils';
 import {
@@ -63,8 +68,8 @@ import * as z from 'zod';
 //   "is_dp": true
 
 const preferenceSchema = z.object({
-    category_ids: z.string().nonempty({
-        message: 'Category is required'
+    category_ids: z.array(z.string()).min(1, {
+        message: 'Category is required. Please choose at least one category'
     }),
     province_id: z.string().nonempty({
         message: 'Province is required'
@@ -165,8 +170,7 @@ export default function StepPreference() {
                         : 'female'
             },
             search_preferences: data.preferences.map((pref) => ({
-                category_ids:
-                    pref.category_ids?.split(',').map((id) => id) || [],
+                category_ids: pref.category_ids || [],
                 province_id: pref.province_id,
                 regency_id: pref.regency_id,
                 district_id: pref.district_id,
@@ -235,38 +239,65 @@ export default function StepPreference() {
                                                 <div className="w-full">
                                                     <FormField
                                                         control={control}
-                                                        name={getPreferenceKeyName(
-                                                            index,
-                                                            'category_ids'
-                                                        )}
-                                                        render={({ field }) => (
-                                                            <MotalentFormItem
-                                                                label="Category"
-                                                                description="Please choose your category"
-                                                            >
-                                                                <MotalentSelect
-                                                                    {...field}
-                                                                    value={field.value.toString()}
-                                                                    onValueChange={(
-                                                                        value
-                                                                    ) => {
-                                                                        field.onChange(
+                                                        name={
+                                                            getPreferenceKeyName(
+                                                                index,
+                                                                'category_ids'
+                                                            ) as 'preferences.0.category_ids'
+                                                        }
+                                                        render={({ field }) => {
+                                                            const value =
+                                                                getMultiValues(
+                                                                    categoryOptions,
+                                                                    field.value,
+                                                                    (option) =>
+                                                                        option.value
+                                                                );
+
+                                                            return (
+                                                                <MotalentFormItem
+                                                                    label="Category"
+                                                                    description="Please choose your category"
+                                                                >
+                                                                    <MotalentCoolSelect<
+                                                                        SelectOption,
+                                                                        true
+                                                                    >
+                                                                        options={
+                                                                            categoryOptions ||
+                                                                            []
+                                                                        }
+                                                                        value={
                                                                             value
-                                                                        );
-                                                                    }}
-                                                                    ref={
-                                                                        field.ref
-                                                                    }
-                                                                    options={
-                                                                        categoryOptions ||
-                                                                        []
-                                                                    }
-                                                                    isLoading={
-                                                                        isLoadingGetCategoryOptions
-                                                                    }
-                                                                />
-                                                            </MotalentFormItem>
-                                                        )}
+                                                                        }
+                                                                        onChange={(
+                                                                            newValues
+                                                                        ) => {
+                                                                            onMultiChange(
+                                                                                newValues,
+                                                                                field.onChange,
+                                                                                (
+                                                                                    option
+                                                                                ) =>
+                                                                                    option.value
+                                                                            );
+                                                                        }}
+                                                                        isMulti
+                                                                        closeMenuOnSelect={
+                                                                            false
+                                                                        }
+                                                                        hideSelectedOptions={
+                                                                            false
+                                                                        }
+                                                                        isClearable
+                                                                        placeholder="Select Category"
+                                                                        isLoading={
+                                                                            isLoadingGetCategoryOptions
+                                                                        }
+                                                                    />
+                                                                </MotalentFormItem>
+                                                            );
+                                                        }}
                                                     />
                                                 </div>
                                             </div>
