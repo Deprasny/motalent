@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { UserNav } from '../shared/organisms/motalent-user-nav.organism';
 import { useSession } from 'next-auth/react';
 
@@ -11,7 +12,9 @@ const Navbar = ({ children }: INavbarProps) => {
         <div>
             <div className="border-b">
                 <div className="flex items-center my-4 justify-between w-[1240px] mx-auto ">
-                    <div className="w-[295px]">Logo</div>
+                    <div className="w-[295px]">
+                        <Link href="/">Logo </Link>
+                    </div>
                     <div className="flex items-center justify-center gap-x-10">
                         <p>Talent</p>
                         <p>Offer</p>

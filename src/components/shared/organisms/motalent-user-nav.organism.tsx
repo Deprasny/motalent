@@ -13,6 +13,7 @@ import {
     DropdownMenuShortcut,
     DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
+import Link from 'next/link';
 
 export function UserNav() {
     const { data } = useSession();
@@ -24,7 +25,10 @@ export function UserNav() {
                     className="relative h-8 w-8 rounded-full"
                 >
                     <Avatar className="h-8 w-8">
-                        <AvatarImage src="/avatars/01.png" alt="@shadcn" />
+                        <AvatarImage
+                            src="https://iili.io/JJKD5Q4.jpg"
+                            alt="@shadcn"
+                        />
                         <AvatarFallback>SC</AvatarFallback>
                     </Avatar>
                 </Button>
@@ -42,14 +46,17 @@ export function UserNav() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                    <DropdownMenuItem>
-                        <User className="mr-2 h-4 w-4" />
-                        <span>Profile</span>
-                        <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-                    </DropdownMenuItem>
+                    <Link href="/profile">
+                        <DropdownMenuItem className="cursor-pointer">
+                            <User className="mr-2 h-4 w-4" />
+                            <span>Profile</span>
+                            <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+                        </DropdownMenuItem>
+                    </Link>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
+                    className="cursor-pointer"
                     onClick={() =>
                         signOut({
                             callbackUrl: '/auth/login',
