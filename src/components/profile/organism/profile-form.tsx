@@ -1,13 +1,16 @@
-import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Session } from 'next-auth';
+import { z } from 'zod';
 
 import MotalentForm from '@/components/shared/molecules/motalent-form';
 import MotalentFormItem from '@/components/shared/molecules/motalent-form-item';
 import MotalentInput from '@/components/shared/molecules/motalent-input';
 import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/form';
-import { InferZodSchema } from '@/interfaces/zod.interface';
-import { useSession } from 'next-auth/react';
+
+import { useUpdateProfile } from '@/hooks/auth/useUpdateProfile';
+
+import { UpdateAccountRequestBody } from '@/interfaces/auth.interface';
 
 const formSchema = z
     .object({
@@ -20,20 +23,45 @@ const formSchema = z
                 message: 'Email is invalid.'
             }),
         name: z.string().min(2),
-        password: z.string().nonempty('Password is required.'),
-        passwordConfirmation: z.string()
+        password: z.string().optional(),
+        password_confirmation: z.string()
     })
-    .refine((data) => data.password === data.passwordConfirmation, {
+
+    .refine(
+        (data) => {
+            if (data.password_confirmation) {
+                return !!data.password;
+            }
+            return true;
+        },
+        {
+            message: 'Fill in the password before confirming.',
+            path: ['password_confirmation']
+        }
+    )
+
+    .refine((data) => data.password === data.password_confirmation, {
         message: 'Passwords do not match.',
-        path: ['passwordConfirmation']
+        path: ['password_confirmation']
     });
 
-type ProfileValues = InferZodSchema<typeof formSchema>;
+type ProfileValues = UpdateAccountRequestBody;
 
-const ProfileForm = () => {
-    const { data: session } = useSession();
+interface Props {
+    session: Session;
+}
+
+const ProfileForm = (session: Props) => {
+    const { name, email, id } = session.session.user;
+    const { mutateAsync } = useUpdateProfile();
+
     const handleSubmit = async (data: ProfileValues) => {
-        console.table(data);
+        const updatedData: ProfileValues = { ...data, id: id.toString() };
+        if (!updatedData.password) {
+            delete updatedData.password;
+            delete updatedData.password_confirmation;
+        }
+        mutateAsync(updatedData);
     };
 
     return (
@@ -41,10 +69,10 @@ const ProfileForm = () => {
             onSubmit={async (data) => await handleSubmit(data)}
             resolver={zodResolver(formSchema)}
             defaultValues={{
-                email: session?.user?.email || '',
-                name: session?.user?.name || '',
+                email: email || '',
+                name: name || '',
                 password: '',
-                passwordConfirmation: ''
+                password_confirmation: ''
             }}
             mode="onChange"
         >
@@ -99,7 +127,7 @@ const ProfileForm = () => {
                         />
 
                         <FormField
-                            name="passwordConfirmation"
+                            name="password_confirmation"
                             control={control}
                             render={({ field }) => (
                                 <MotalentFormItem label="Password Confirmation">
@@ -113,7 +141,7 @@ const ProfileForm = () => {
                             )}
                         />
                     </div>
-                    <div className="flex justify-end items-end mt-5">
+                    <div className="flex items-end justify-end mt-5">
                         <Button
                             loadingText="Signin..."
                             isLoading={formState.isSubmitting}

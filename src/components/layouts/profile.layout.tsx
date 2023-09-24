@@ -1,15 +1,16 @@
 import React from 'react';
-import { Separator } from '../ui/separator';
+
 import { SidebarNav } from '../profile/organism/sidebar-nav';
+import { Separator } from '../ui/separator';
 
 const sidebarNavItems = [
     {
-        title: 'Setting',
-        href: '/profile/setting'
+        title: 'Setting Account',
+        href: '/profile/account'
     },
     {
-        title: 'Account',
-        href: '/'
+        title: 'Setting Client',
+        href: '/profile/setting'
     }
 ];
 

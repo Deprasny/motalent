@@ -1,9 +1,9 @@
-import React from 'react';
-
-import { AuthLayout } from '@/components/layouts';
-import { AuthContainer } from '@/components/auth/organisms';
-import { RegisterForm } from '@/components/auth/molecules';
 import { GetServerSideProps } from 'next';
+
+import { RegisterForm } from '@/components/auth/molecules';
+import { AuthContainer } from '@/components/auth/organisms';
+import { AuthLayout } from '@/components/layouts';
+
 import { getAuthServerSession } from '@/lib/get-auth-server-session';
 
 const AuthRegisterPage = () => {

@@ -3,18 +3,18 @@ import { Session } from 'next-auth';
 
 import Profile from '../layout';
 
-import SettingForm from '@/components/profile/organism/setting-form';
+import ProfileForm from '@/components/profile/organism/profile-form';
 
 import { getAuthServerSession } from '@/lib/get-auth-server-session';
 
-interface SettingProps {
+interface AccountProps {
     session: Session;
 }
 
-const Setting = ({ session }: SettingProps) => {
+const Setting = ({ session }: AccountProps) => {
     return (
         <Profile>
-            <SettingForm session={session} />
+            <ProfileForm session={session} />
         </Profile>
     );
 };

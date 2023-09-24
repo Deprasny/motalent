@@ -1,11 +1,15 @@
-import { BaseResponse } from '@/interfaces/global.interface';
+import { User } from 'next-auth';
+
 import { RequestAdapter } from './request-adapter.service';
+
 import {
     SignInResponse,
+    SignUpRequestBody,
     SignUpResponse,
-    SignUpRequestBody
+    UpdateProfileRequestBody
 } from '@/interfaces/auth.interface';
-import { User } from 'next-auth';
+import { BaseResponse } from '@/interfaces/global.interface';
+
 import { parseArrayErrorMessage } from '@/lib/error-parser';
 
 export class AuthService extends RequestAdapter {
@@ -75,6 +79,25 @@ export class AuthService extends RequestAdapter {
 
             return data?.data;
         } catch (error) {
+            throw error;
+        }
+    }
+
+    public async updateProfile(
+        body: UpdateProfileRequestBody
+    ): Promise<string> {
+        try {
+            const response = await this.sendPutRequest<
+                UpdateProfileRequestBody,
+                string
+            >('/auth/update-profile', body);
+
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                console.log(error.response.data);
+                return error.response.data.message;
+            }
             throw error;
         }
     }

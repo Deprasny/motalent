@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+
+import { cn } from '@/lib/utils';
 
 interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
     items: {

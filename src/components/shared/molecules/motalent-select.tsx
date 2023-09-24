@@ -1,4 +1,9 @@
+import * as SelectPrimitive from '@radix-ui/react-select';
+import { LoaderIcon } from 'lucide-react';
 import { forwardRef } from 'react';
+import React from 'react';
+
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
     Select,
     SelectContent,
@@ -6,11 +11,8 @@ import {
     SelectTrigger,
     SelectValue
 } from '@/components/ui/select';
+
 import { SelectOptions } from '@/interfaces/global.interface';
-import * as SelectPrimitive from '@radix-ui/react-select';
-import React from 'react';
-import { LoaderIcon } from 'lucide-react';
-import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface MotalentSelectProps extends SelectPrimitive.SelectProps {
     options?: SelectOptions;

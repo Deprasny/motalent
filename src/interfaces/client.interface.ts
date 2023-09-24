@@ -30,3 +30,16 @@ interface SearchPreference {
     is_negotiable: boolean;
     is_dp: boolean;
 }
+
+export interface UpdateClientRequestBody {
+    name: string;
+    bio: string;
+    dob: string;
+    address: string;
+    gender: string;
+    blood_type: string;
+    province_id: string;
+    regency_id: string;
+    district_id: string;
+    village_id: string;
+}

@@ -1,5 +1,6 @@
-import { signOut, useSession } from 'next-auth/react';
 import { LogOut, User } from 'lucide-react';
+import { signOut, useSession } from 'next-auth/react';
+import Link from 'next/link';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -13,7 +14,6 @@ import {
     DropdownMenuShortcut,
     DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import Link from 'next/link';
 
 export function UserNav() {
     const { data } = useSession();
@@ -22,9 +22,9 @@ export function UserNav() {
             <DropdownMenuTrigger asChild>
                 <Button
                     variant="ghost"
-                    className="relative h-8 w-8 rounded-full"
+                    className="relative w-8 h-8 rounded-full"
                 >
-                    <Avatar className="h-8 w-8">
+                    <Avatar className="w-8 h-8">
                         <AvatarImage
                             src="https://iili.io/JJKD5Q4.jpg"
                             alt="@shadcn"
@@ -46,9 +46,9 @@ export function UserNav() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                    <Link href="/profile">
+                    <Link href="/profile/account">
                         <DropdownMenuItem className="cursor-pointer">
-                            <User className="mr-2 h-4 w-4" />
+                            <User className="w-4 h-4 mr-2" />
                             <span>Profile</span>
                             <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
                         </DropdownMenuItem>
@@ -64,7 +64,7 @@ export function UserNav() {
                         })
                     }
                 >
-                    <LogOut className="mr-2 h-4 w-4" />
+                    <LogOut className="w-4 h-4 mr-2" />
                     <span>Log out</span>
                     <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
                 </DropdownMenuItem>

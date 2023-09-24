@@ -1,14 +1,15 @@
-import { SelectOption } from '@/interfaces/global.interface';
 import clsx from 'clsx';
 import { Check, XIcon } from 'lucide-react';
 import Select, {
     ClearIndicatorProps,
-    MultiValueRemoveProps,
     GroupBase,
-    Props,
     MultiValue,
+    MultiValueRemoveProps,
+    Props,
     components
 } from 'react-select';
+
+import { SelectOption } from '@/interfaces/global.interface';
 
 interface MotalentCoolSelectProps<
     Option = unknown,

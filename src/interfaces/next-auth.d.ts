@@ -27,7 +27,7 @@ declare module 'next-auth' {
             dob: string;
             address: string;
             gender: string;
-            blood_type: number;
+            blood_type: string;
             province_id: string;
             regency_id: string;
             district_id: string;

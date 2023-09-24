@@ -12,3 +12,7 @@ export interface SignUpRequestBody {
     password: string;
     password_confirmation: string;
 }
+
+export interface UpdateAccountRequestBody extends Partial<SignUpRequestBody> {
+    id: string;
+}

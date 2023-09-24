@@ -1,4 +1,3 @@
-import { ENV_CONFIG } from '@/lib/env-config';
 import axios, {
     AxiosInstance,
     AxiosRequestConfig,
@@ -6,7 +5,9 @@ import axios, {
     CreateAxiosDefaults,
     InternalAxiosRequestConfig
 } from 'axios';
-import { getSession } from 'next-auth/react';
+import { getSession, signOut } from 'next-auth/react';
+
+import { ENV_CONFIG } from '@/lib/env-config';
 
 interface RequestAdapterProps extends CreateAxiosDefaults {}
 
@@ -42,10 +43,14 @@ export class RequestAdapter {
         }
     }
 
-    private interceptResponse(
+    private async interceptResponse(
         response: AxiosResponse
-    ): AxiosResponse | Promise<AxiosResponse> {
+    ): Promise<AxiosResponse> {
         {
+            console.log('depras');
+            if (response.status === 401 || response.status === 403) {
+                await signOut({ callbackUrl: '/auth/login', redirect: true });
+            }
             return response;
         }
     }

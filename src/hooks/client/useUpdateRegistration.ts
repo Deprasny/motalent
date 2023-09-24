@@ -1,8 +1,10 @@
-import { UpdateClientRegistrationBody } from '@/interfaces/client.interface';
-import { ClientService } from '@/services/client.service';
 import { useMutation } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
+
+import { UpdateClientRegistrationBody } from '@/interfaces/client.interface';
+
+import { ClientService } from '@/services/client.service';
 
 export function useUpdateRegistration() {
     const service = new ClientService();

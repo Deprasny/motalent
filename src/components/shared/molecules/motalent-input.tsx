@@ -1,7 +1,8 @@
-import { useFormField } from '@/components/ui/form';
-import { Input, InputProps } from '@/components/ui/input';
 import { VariantProps, cva } from 'class-variance-authority';
 import React from 'react';
+
+import { useFormField } from '@/components/ui/form';
+import { Input, InputProps } from '@/components/ui/input';
 
 const motalentCVA = cva([''], {
     variants: {

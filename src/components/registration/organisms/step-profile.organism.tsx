@@ -1,23 +1,23 @@
-import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useSession } from 'next-auth/react';
+import * as z from 'zod';
 
+import MotalentCard from '@/components/shared/molecules/motalent-card';
 import MotalentForm from '@/components/shared/molecules/motalent-form';
 import MotalentFormItem from '@/components/shared/molecules/motalent-form-item';
 import MotalentInput from '@/components/shared/molecules/motalent-input';
 import MotalentSelect from '@/components/shared/molecules/motalent-select';
+import { useStepperContext } from '@/components/shared/organisms/motalent-stepper.organism';
+import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/form';
-import { SelectOptions } from '@/interfaces/global.interface';
 
+import { SelectOptions } from '@/interfaces/global.interface';
 import { InferZodSchema } from '@/interfaces/zod.interface';
 
 import {
     ClientProfileFormState,
     useClientRegistrationFormWizard
 } from '@/stores/client-registration-form-wizard.store';
-import { useStepperContext } from '@/components/shared/organisms/motalent-stepper.organism';
-import { Button } from '@/components/ui/button';
-import MotalentCard from '@/components/shared/molecules/motalent-card';
 
 const formSchema = z.object({
     name: z.string().nonempty(),
@@ -160,28 +160,26 @@ const StepProfile = () => {
                                 />
                             </div>
 
-                            <div className="w-full">
-                                <FormField
-                                    control={control}
-                                    name="blood_type"
-                                    render={({ field }) => (
-                                        <MotalentFormItem
-                                            label="Blood Type"
-                                            description="Please choose your blood type"
-                                        >
-                                            <MotalentSelect
-                                                value={field.value || undefined}
-                                                onValueChange={(value) => {
-                                                    field.onChange(value);
-                                                }}
-                                                ref={field.ref}
-                                                options={BLOOD_TYPES}
-                                                height="h-auto"
-                                            />
-                                        </MotalentFormItem>
-                                    )}
-                                />
-                            </div>
+                            <FormField
+                                control={control}
+                                name="blood_type"
+                                render={({ field }) => (
+                                    <MotalentFormItem
+                                        label="Blood Type"
+                                        description="Please choose your blood type"
+                                    >
+                                        <MotalentSelect
+                                            value={field.value || undefined}
+                                            onValueChange={(value) => {
+                                                field.onChange(value);
+                                            }}
+                                            ref={field.ref}
+                                            options={BLOOD_TYPES}
+                                            height="h-auto"
+                                        />
+                                    </MotalentFormItem>
+                                )}
+                            />
                         </div>
 
                         <div className="flex items-center justify-center gap-x-5">
@@ -245,7 +243,7 @@ const StepProfile = () => {
                             </div>
                         </div>
 
-                        <div className="flex w-full justify-end self-end gap-3">
+                        <div className="flex self-end justify-end w-full gap-3">
                             <Button disabled={stepperContext?.isFirstStep}>
                                 Prev
                             </Button>

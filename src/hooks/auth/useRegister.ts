@@ -1,11 +1,13 @@
+import { useMutation } from '@tanstack/react-query';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/router';
-import { useMutation } from '@tanstack/react-query';
+
+import { useToast } from '@/components/ui/use-toast';
 
 import { SignUpRequestBody } from '@/interfaces/auth.interface';
 import { BaseResponse } from '@/interfaces/global.interface';
+
 import { AuthService } from '@/services/auth.service';
-import { useToast } from '@/components/ui/use-toast';
 
 export function useRegister() {
     const autservice = new AuthService();
